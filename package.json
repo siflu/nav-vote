@@ -20,6 +20,7 @@
     "dexie": "^3.0.3",
     "dexie-encrypted": "^2.0.0",
     "localforage": "^1.10.0",
+    "material-ui-colors": "^1.0.0",
     "navcoin-js": "^1.0.16",
     "node-binance-api": "^0.13.0",
     "pouchdb-adapter-node-websql": "^7.0.0",

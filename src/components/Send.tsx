@@ -71,15 +71,15 @@ export default function Send(props: any): React.ReactElement {
         sx={{
           maxWidth: 800,
           width: "90%",
-          borderRadius: 1,
+          boxShadow: 2,
+          borderRadius: 2,
           mt: 2,
-
           p: 2,
           pt: 4,
           alignSelf: "center",
           alignItems: "center",
           justifyContent: "center",
-          bgcolor: "background.paper",
+          bgcolor: "background.default",
         }}
       >
         <Box
@@ -92,7 +92,10 @@ export default function Send(props: any): React.ReactElement {
               <></>
             ) : (
               <FormControl>
-                <InputLabel id="network-label">From</InputLabel>
+                <InputLabel id="network-label"
+                sx={{
+                  color: "text.primary",
+                }}>From</InputLabel>
 
                 <Select
                   labelId={"network-label"}
@@ -137,6 +140,7 @@ export default function Send(props: any): React.ReactElement {
                   fullWidth
                   error={errorDest}
                   InputLabelProps={{
+                    style: { color: "#303030" },
                     shrink: true,
                   }}
                   onChange={(e) => {
@@ -164,7 +168,8 @@ export default function Send(props: any): React.ReactElement {
                   fullWidth
                   error={errorAmount}
                   InputLabelProps={{
-                      shrink: true,
+                    style: { color: "#303030" },
+                    shrink: true,
                   }}
                   value={amount}
                   onChange={(e) => {
@@ -177,11 +182,15 @@ export default function Send(props: any): React.ReactElement {
                       }
                   }}
                   InputProps={{
+                    style: { color: "#303030" },
                       endAdornment: (
                           <InputAdornment position="end">
                               <Typography
                                   onClick={() => {
                                       setAmount(available);
+                                  }}
+                                  sx={{
+                                    color: "text.primary"
                                   }}
                               >
                                   MAX

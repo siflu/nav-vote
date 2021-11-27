@@ -52,7 +52,7 @@ function useWindowDimensions() {
   return windowDimensions;
 }
 
-function Chat(props: any): React.ReactElement {
+function Polls(props: any): React.ReactElement {
   const { balances, history, syncProgress, pendingQueue, addresses, wallet, onSend, network } =
     props;
 
@@ -191,4 +191,4 @@ function Chat(props: any): React.ReactElement {
   );
 }
 
-export default Chat;
+export default Polls;

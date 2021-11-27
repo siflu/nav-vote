@@ -21,8 +21,10 @@ import {
 
 import {
   AccountBalanceOutlined,
+  MailOutlineOutlined,
   MoveToInboxOutlined,
   PaymentOutlined,
+  PollOutlined,
   SettingsOutlined,
 } from "@material-ui/icons";
 
@@ -36,7 +38,8 @@ import nav from "./assets/NAV.png";
 import Receive from "./components/Receive";
 import Send from "./components/Send";
 import ConfirmTx from "./components/ConfirmTx";
-import Chat from "./components/Chat";
+import Vote from "./components/Vote";
+import Polls from "./components/Polls";
 
 themeOptions.spacing(10);
 
@@ -558,6 +561,28 @@ class App extends React.Component<any, any> {
                   ) : bottomNavigation == 2 ? (
                       <Receive addresses={addresses}></Receive>
                   ) : bottomNavigation == 3 ? (
+                        <Polls
+                            addresses={addresses}
+                            balances={balances}
+                            history={history}
+                            syncProgress={syncProgress}
+                            pendingQueue={pendingQueue}
+                            wallet={this.njs.wallet}
+                            network={this.wallet.network}
+                            onSend={this.onSend}
+                        />
+                    ) : bottomNavigation == 4 ? (
+                        <Vote
+                            addresses={addresses}
+                            balances={balances}
+                            history={history}
+                            syncProgress={syncProgress}
+                            pendingQueue={pendingQueue}
+                            wallet={this.njs.wallet}
+                            network={this.wallet.network}
+                            onSend={this.onSend}
+                        />
+                    ) : bottomNavigation == 5 ? (
                       <Settings
                           onClose={() => {
                             this.onClose();
@@ -583,18 +608,7 @@ class App extends React.Component<any, any> {
                           walletName={walletName}
                           network={this.wallet.network}
                       ></Settings>
-                  ) : bottomNavigation == 4 ? (
-                          <Chat
-                              addresses={addresses}
-                              balances={balances}
-                              history={history}
-                              syncProgress={syncProgress}
-                              pendingQueue={pendingQueue}
-                              wallet={this.njs.wallet}
-                              network={this.wallet.network}
-                              onSend={this.onSend}
-                          />
-                      )
+                  ) 
                       : (
                           <>Unknown</>
                       )}
@@ -622,11 +636,15 @@ class App extends React.Component<any, any> {
                           icon={<MoveToInboxOutlined />}
                       />
                       <BottomNavigationAction
-                          label="Settings"
-                          icon={<SettingsOutlined />}
+                          label="Polls"
+                          icon={<PollOutlined />}
                       />
                       <BottomNavigationAction
-                          label="Chat"
+                          label="Vote"
+                          icon={<MailOutlineOutlined />}
+                      />
+                      <BottomNavigationAction
+                          label="Settings"
                           icon={<SettingsOutlined />}
                       />
                     </BottomNavigation>

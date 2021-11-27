@@ -60,13 +60,14 @@ function Receive(props: any): React.ReactElement {
       )}
       <Box
         sx={{
-          maxWidth: "90%",
+          maxWidth: "100%",
           width: "800",
           borderRadius: 1,
           mt: 2,
           alignSelf: "center",
           alignItems: "center",
           justifyContent: "center",
+          
         }}
       >
         <Box
@@ -78,6 +79,7 @@ function Receive(props: any): React.ReactElement {
             alignItems: "center",
             justifyContent: "center",
             flexDirection: "column",
+            
           }}
         >
           {addressTypes.length > 1 ? (
@@ -89,15 +91,16 @@ function Receive(props: any): React.ReactElement {
                 alignItems: "center",
                 justifyContent: "center",
                 mb: 2,
+                
               }}
             >
-              <Box sx={{ mx: 4, width: 250 }}>
+              <Box sx={{ mx: 4 }}>
                 <SplitButton
                   onChange={(index: number) => {
                     setAddressType(addressTypes[index]);
                   }}
                   options={addressOptions}
-                  width={250}
+                  
                 ></SplitButton>
               </Box>
             </Box>
@@ -122,7 +125,7 @@ function Receive(props: any): React.ReactElement {
               p: 2,
               position: "relative",
               wordBreak: "break-word",
-              width: 250,
+              width: 450,
             }}
           >
             <CopyToClipboard text={address}>

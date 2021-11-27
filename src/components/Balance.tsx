@@ -89,7 +89,7 @@ function Balance(props: any): React.ReactElement {
           <LinearProgress
             variant={syncProgress == 0 ? "indeterminate" : "determinate"}
             value={syncProgress}
-            sx={{ backgroundColor: "background.paper" }}
+            sx={{ backgroundColor: "background.default" }}
           ></LinearProgress>
         </>
       ) : (
@@ -132,9 +132,9 @@ function Balance(props: any): React.ReactElement {
         sx={{
           maxWidth: 800,
           width: "90%",
-          bgcolor: "background.paper",
-          boxShadow: 1,
-          borderRadius: 1,
+          bgcolor: "background.default",
+          boxShadow: 2,
+          borderRadius: 2,
           p: 1,
           mt: 2,
           alignSelf: "center",
@@ -174,7 +174,7 @@ function Balance(props: any): React.ReactElement {
             />
             <Box
               sx={{
-                color: "info.dark",
+                color: "text.primary",
                 fontWeight: "medium",
                 mx: 0.5,
                 fontSize: 12,
@@ -188,7 +188,7 @@ function Balance(props: any): React.ReactElement {
           <Box sx={{ padding: 1 }}>
             <Box
               sx={{
-                color: "text.secondary",
+                color: "text.primary",
                 fontSize: 18,
                 fontWeight: "medium",
                 textAlign: "center",
@@ -208,7 +208,7 @@ function Balance(props: any): React.ReactElement {
             />
             <Box
               sx={{
-                color: "info.dark",
+                color: "text.primary",
                 fontWeight: "medium",
                 mx: 0.5,
                 fontSize: 12,
@@ -222,7 +222,7 @@ function Balance(props: any): React.ReactElement {
           <Box sx={{ padding: 1 }}>
             <Box
               sx={{
-                color: "text.secondary",
+                color: "text.primary",
                 fontSize: 18,
                 fontWeight: "medium",
                 textAlign: "center",
@@ -242,7 +242,7 @@ function Balance(props: any): React.ReactElement {
             />
             <Box
               sx={{
-                color: "info.dark",
+                color: "text.primary",
                 fontWeight: "medium",
                 mx: 0.5,
                 fontSize: 12,
@@ -258,9 +258,9 @@ function Balance(props: any): React.ReactElement {
         sx={{
           maxWidth: 800,
           width: "90%",
-          bgcolor: "background.paper",
-          boxShadow: 1,
-          borderRadius: 1,
+          bgcolor: "background.default",
+          boxShadow: 2,
+          borderRadius: 2,
           mt: 2,
           alignSelf: "center",
         }}
@@ -268,8 +268,8 @@ function Balance(props: any): React.ReactElement {
         <List
           sx={{
             maxWidth: 800,
-            bgcolor: "background.paper",
-            overflow: "scroll",
+            bgcolor: "background.default",
+            overflow: "hidden",
             flexGrow: 1,
           }}
         >
@@ -333,7 +333,7 @@ function Balance(props: any): React.ReactElement {
                               textAlign: "right",
                               fontSize: "12px",
                             }}
-                            color="text.secondary"
+                            color="text.primary"
                             variant="body2"
                           >
                             {new Date(el.timestamp * 1000).toLocaleString()}{" "}
@@ -348,7 +348,7 @@ function Balance(props: any): React.ReactElement {
                               textAlign: "right",
                               fontSize: "12px",
                             }}
-                            color="text.secondary"
+                            color="text.primary"
                             variant="body2"
                           >
                             {el.confirmed ? "Confirmed" : "Pending"}
