@@ -47,7 +47,8 @@ export default function CreatePoll(props: any): React.ReactElement {
   const poll = {
       title: '',
       options: '',
-      sender: ''
+      createdBy: '',
+      isPoll: true
   }
 
   return (
@@ -155,7 +156,7 @@ export default function CreatePoll(props: any): React.ReactElement {
 
               poll.title = title;
               poll.options = message;
-              poll.sender = Object.entries(addresses["spending"]["private"]).filter((el: any) => el[1].used === 1 && el[1]["balances"]["xnav"].confirmed > 1)[0][0];
+              poll.createdBy = Object.entries(addresses["spending"]["private"]).filter((el: any) => el[1].used === 1 && el[1]["balances"]["xnav"].confirmed > 1)[0][0];
 
               if (!errorDest && to) {
                 await onSend(

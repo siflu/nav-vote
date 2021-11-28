@@ -26,6 +26,7 @@ import xnav from "../assets/XNAV.png";
 import Receive from "./Receive";
 import MyUsername from "./MyUsername";
 import CreatePoll from "./CreatePoll";
+import ListPolls from "./ListPolls";
 
 function getWindowDimensions() {
   const { innerWidth: width, innerHeight: height } = window;
@@ -106,81 +107,14 @@ function Polls(props: any): React.ReactElement {
                    balance={balances}
                    addresses={addresses}></CreatePoll>
 
-      <Box
-        sx={{
-          maxWidth: 800,
-          width: "90%",
-          bgcolor: "background.paper",
-          boxShadow: 1,
-          borderRadius: 1,
-          mt: 2,
-          alignSelf: "center",
-        }}
-      >
-        <List
-          sx={{
-            maxWidth: 800,
-            bgcolor: "background.paper",
-            overflow: "scroll",
-            flexGrow: 1,
-          }}
-        >
-          {filteredHistory
-            .slice((pageNumber - 1) * itemsCount, pageNumber * itemsCount)
-            .map((el: any) => {
-              return (
-                <>
-                  <ListItem
-                    alignItems="flex-start"
-                    key={el.id}
-                    sx={{
-                      paddingLeft: 4,
-                    }}
-                  >
-                    <ListItemAvatar>
-                      <Avatar
-                        alt={el.type == "xnav" ? xnav : nav}
-                        src={el.type == "xnav" ? xnav : nav}
-                      />
-                    </ListItemAvatar>
-                    <ListItemText
-                      primary={
-                        <Typography
-                          sx={{
-                            color: (theme) =>
-                              el.amount > 0
-                                ? theme.palette.success.light
-                                : theme.palette.error.light,
-                            fontSize: "14px",
-                          }}
-                        >
-                            {el.memos.out[0]}
-                        </Typography>
-                      }
-                    />
-                    <ListItemText
-                      primary={
-                        <React.Fragment>
-                          <Typography
-                            sx={{
-                              paddingRight: 4,
-                              textAlign: "right",
-                              fontSize: "12px",
-                            }}
-                            color="text.secondary"
-                            variant="body2"
-                          >
-                            {new Date(el.timestamp * 1000).toLocaleString()}{" "}
-                          </Typography>
-                        </React.Fragment>
-                      }
-                    />
-                  </ListItem>
-                </>
-              );
-            })}
-        </List>
-      </Box>
+      <ListPolls addresses={addresses}
+                            balances={balances}
+                            history={history}
+                            syncProgress={syncProgress}
+                            pendingQueue={pendingQueue}
+                            wallet={wallet}
+                            network={network}
+                            onSend={onSend}></ListPolls>
       <Pagination
         sx={{ mt: 2, mx: "auto" }}
         count={Math.ceil(filteredHistory.length / itemsCount)}
