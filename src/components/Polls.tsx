@@ -27,6 +27,7 @@ import Receive from "./Receive";
 import MyUsername from "./MyUsername";
 import CreatePoll from "./CreatePoll";
 import ListPolls from "./ListPolls";
+import ListOwnPolls from "./ListOwnPolls";
 
 function getWindowDimensions() {
   const { innerWidth: width, innerHeight: height } = window;
@@ -106,6 +107,25 @@ function Polls(props: any): React.ReactElement {
                    onSend={onSend}
                    balance={balances}
                    addresses={addresses}></CreatePoll>
+
+      <ListOwnPolls addresses={addresses}
+                            balances={balances}
+                            history={history}
+                            syncProgress={syncProgress}
+                            pendingQueue={pendingQueue}
+                            wallet={wallet}
+                            network={network}
+                            onSend={onSend}></ListOwnPolls>
+
+            <Pagination
+              sx={{ mt: 2, mx: "auto" }}
+              count={Math.ceil(filteredHistory.length / itemsCount)}
+              variant="outlined"
+              shape="rounded"
+              onChange={(event: React.ChangeEvent<unknown>, value: number) => {
+                setPageNumber(value);
+              }}
+            />
     </Box>
   );
 }

@@ -72,8 +72,6 @@ function Vote(props: any): React.ReactElement {
   };
 
   const filteredHistory = history.filter((el: any) => el.memos.out[0] != "" && el.memos.out[0] != "Change");
-
-
   const itemsCount = Math.floor((height - 390) / 70);
 
   return (

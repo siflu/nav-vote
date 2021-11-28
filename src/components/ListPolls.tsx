@@ -237,7 +237,8 @@ function ListPolls(props: any): React.ReactElement {
                 title: poll.title,
                 answer: selectedOption,
                 createdBy: poll.createdBy,
-                validUntil: poll.validUntil
+                validUntil: poll.validUntil,
+                isPollAnswer: true
               }
 
               
