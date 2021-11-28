@@ -177,52 +177,6 @@ function ListOwnPolls(props: any): React.ReactElement {
                     console.log("Count: " + value);
                 })
             })
-            
-            
-            //   return (
-            //     <>
-            //     <ListItem
-            //         alignItems="flex-start"
-            //         key={el.id}
-            //         sx={{
-            //           paddingLeft: 4,
-                      
-            //         }}>
-            //         <Stack 
-            //             spacing={2}
-            //             sx={{
-            //             m: 4,
-            //             width: "100%"
-            //             }}>  
-            //             <ListItemText
-            //             primary={
-            //                 <Typography
-            //                 sx={{
-            //                     mt: 4,
-            //                     mb: 2,
-            //                     maxWidth: "100%",
-            //                     width: "100%",
-            //                     wordWrap: "break-word",
-            //                     textAlign: "left",
-            //                 }}
-            //                 variant={"h5"}
-            //                 >
-            //                 {pollAnswer.title}
-            //                 </Typography>
-            //             }
-            //             />
-
-            //         </Stack>
-            //     </ListItem>
-
-            //     <Box
-            //     sx={{
-            //         m: (theme) => theme.spacing(2, 4, 2, 2),
-            //     }}
-            //     >    
-            //     </Box>
-            //     </>
-            //   );
         }
         </List>
       </Box>

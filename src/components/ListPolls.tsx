@@ -241,11 +241,6 @@ function ListPolls(props: any): React.ReactElement {
                 isPollAnswer: true
               }
 
-              
-              console.log("********************************************************************");
-              console.log(JSON.stringify(pollAnswer));
-              console.log("********************************************************************");
-              
               if (!errorDest && returnAddress) {
                 await onSend(
                     from,
