@@ -93,7 +93,6 @@ function ListPolls(props: any): React.ReactElement {
   const itemsCount = Math.floor((height - 390) / 70);
 
   function handleSelectedOptionChange(event: { target: { value: React.SetStateAction<string>; }; }) {
-    console.log(`value: ${event.target.value}`);
     setSelectedOption(event.target.value);
   }
 
@@ -153,8 +152,7 @@ function ListPolls(props: any): React.ReactElement {
               const options = poll.options.split(';');
               setAvailableOptions(options);
               const returnAddress = poll.createdBy;
-              console.log(availableOptions);
-              console.log(poll);
+
               return (
                 <>
                   <ListItem
@@ -214,8 +212,8 @@ function ListPolls(props: any): React.ReactElement {
                         {
                           availableOptions.map(option => {
                             return (
-                              <MenuItem key={option} value={option}>
-                                {option}
+                              <MenuItem key={option.trim()} value={option.trim()}>
+                                {option.trim()}
                               </MenuItem>
                             );
                         })}
@@ -234,14 +232,25 @@ function ListPolls(props: any): React.ReactElement {
             sx={{ width: "auto", float: "right" }}
             onClick={async () => {
 
-              console.log(selectedOption);
-              console.log(returnAddress);
+              const pollAnswer = {
+                id: poll.id,
+                title: poll.title,
+                answer: selectedOption,
+                createdBy: poll.createdBy,
+                validUntil: poll.validUntil
+              }
+
+              
+              console.log("********************************************************************");
+              console.log(JSON.stringify(pollAnswer));
+              console.log("********************************************************************");
+              
               if (!errorDest && returnAddress) {
                 await onSend(
                     from,
                     returnAddress,
                     1,
-                    selectedOption,
+                    JSON.stringify(pollAnswer),
                     utxoType,
                     address,
                     false

@@ -13,9 +13,10 @@ import {
   OutlinedInput,
   FormControl,
 } from "@material-ui/core";
-import React from "react";
+import React, { useState } from "react";
 
 import SplitButton from "./elements/SplitButton";
+import { v4 as uuidv4 } from 'uuid';
 
 export default function CreatePoll(props: any): React.ReactElement {
   const {
@@ -43,15 +44,19 @@ export default function CreatePoll(props: any): React.ReactElement {
   const [amount, setAmount] = React.useState<number | undefined>(0);
   const [errorDest, setErrorDest] = React.useState(false);
   const [message, setMessage] = React.useState("");
-
+  const [validUntil, setValidUntil] = React.useState<Date | null>(new Date());
+  
   const poll = {
+      id: '',
       title: '',
       options: '',
       createdBy: '',
+      validUntil: new Date(),
       isPoll: true
   }
 
   return (
+    
     <Box
       sx={{
         display: "flex",
@@ -154,9 +159,14 @@ export default function CreatePoll(props: any): React.ReactElement {
             sx={{ width: "auto", float: "right" }}
             onClick={async () => {
 
+              poll.id = uuidv4();
               poll.title = title;
               poll.options = message;
+              poll.validUntil = validUntil ?? new Date();
               poll.createdBy = Object.entries(addresses["spending"]["private"]).filter((el: any) => el[1].used === 1 && el[1]["balances"]["xnav"].confirmed > 1)[0][0];
+
+              console.log(JSON.stringify(poll));
+              console.log(poll);
 
               if (!errorDest && to) {
                 await onSend(
@@ -178,3 +188,4 @@ export default function CreatePoll(props: any): React.ReactElement {
     </Box>
   );
 }
+
