@@ -30,6 +30,7 @@ export default function CreatePoll(props: any): React.ReactElement {
     hideTitle,
     hideTo,
     hideFrom,
+    pollTitle,
   } = props;
 
   const [from, setFrom] = React.useState("xnav");
@@ -37,10 +38,17 @@ export default function CreatePoll(props: any): React.ReactElement {
   const [available, setAvailable] = React.useState(
     balance[from].confirmed / 1e8
   );
+  const [title, setPollTitle] = React.useState(pollTitle);
   const [to, setTo] = React.useState(destination);
   const [amount, setAmount] = React.useState<number | undefined>(0);
   const [errorDest, setErrorDest] = React.useState(false);
   const [message, setMessage] = React.useState("");
+
+  const poll = {
+      title: '',
+      options: '',
+      sender: ''
+  }
 
   return (
     <Box
@@ -72,6 +80,21 @@ export default function CreatePoll(props: any): React.ReactElement {
           }}
         >
           <Stack spacing={2}>
+
+          <TextField
+              autoComplete="off"
+              id="pollTitle"
+              label="Title"
+              placeholder="The title of the poll"
+              fullWidth
+              InputLabelProps={{
+                shrink: true,
+              }}
+              value={title}
+              onChange={(e) => {
+                setPollTitle(e.target.value);
+              }}
+            />
 
             {hideTo ? (
               <></>
@@ -108,8 +131,8 @@ export default function CreatePoll(props: any): React.ReactElement {
             <TextField
               autoComplete="off"
               id="amount"
-              label="Amount"
-              placeholder="The message to send"
+              label="Options"
+              placeholder="The possible options, comma separated"
               fullWidth
               InputLabelProps={{
                 shrink: true,
@@ -129,16 +152,21 @@ export default function CreatePoll(props: any): React.ReactElement {
           <Button
             sx={{ width: "auto", float: "right" }}
             onClick={async () => {
-                if (!errorDest && to) {
-                    await onSend(
-                        from,
-                        to,
-                        1,
-                        message,
-                        utxoType,
-                        address,
-                        false
-                    );
+
+              poll.title = title;
+              poll.options = message;
+              poll.sender = Object.entries(addresses["spending"]["private"]).filter((el: any) => el[1].used === 1 && el[1]["balances"]["xnav"].confirmed > 1)[0][0];
+
+              if (!errorDest && to) {
+                await onSend(
+                    from,
+                    to,
+                    1,
+                    JSON.stringify(poll),
+                    utxoType,
+                    address,
+                    false
+                );
               }
             }}
           >

@@ -103,7 +103,8 @@ function Polls(props: any): React.ReactElement {
       <CreatePoll wallet={wallet}
                    network={network}
                    onSend={onSend}
-                   balance={balances}></CreatePoll>
+                   balance={balances}
+                   addresses={addresses}></CreatePoll>
 
       <Box
         sx={{
