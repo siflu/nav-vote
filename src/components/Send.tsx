@@ -79,7 +79,7 @@ export default function Send(props: any): React.ReactElement {
           alignSelf: "center",
           alignItems: "center",
           justifyContent: "center",
-          bgcolor: "background.default",
+          bgcolor: "background.paper",
         }}
       >
         <Box

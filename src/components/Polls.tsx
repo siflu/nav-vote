@@ -25,7 +25,7 @@ import nav from "../assets/NAV.png";
 import xnav from "../assets/XNAV.png";
 import Receive from "./Receive";
 import MyUsername from "./MyUsername";
-import SendMessage from "./SendMessage";
+import CreatePoll from "./CreatePoll";
 
 function getWindowDimensions() {
   const { innerWidth: width, innerHeight: height } = window;
@@ -53,7 +53,7 @@ function useWindowDimensions() {
 }
 
 function Polls(props: any): React.ReactElement {
-  const { balances, history, syncProgress, pendingQueue, addresses, wallet, onSend, network } =
+  const { balances, history, syncProgress, pendingQueue, addresses, hideTitle, wallet, onSend, network } =
     props;
 
   const [hideWarning, setHideWarning] = useState(false);
@@ -84,20 +84,27 @@ function Polls(props: any): React.ReactElement {
         flexDirection: "column",
       }}
     >
-      <Box
-        sx={{
-          maxWidth: 800,
-          width: "90%",
-          bgcolor: "background.paper",
-          boxShadow: 1,
-          borderRadius: 1,
-          p: 1,
-          mt: 2,
-          alignSelf: "center",
-        }}
-      >
-          <MyUsername addresses={addresses}></MyUsername>
-      </Box>
+      {hideTitle ? (
+        <></>
+      ) : (
+        <Typography
+          sx={{
+            m: 4,
+            mb: 2,
+            maxWidth: "100%",
+            wordWrap: "break-word",
+            textAlign: "center",
+          }}
+          variant={"h4"}
+        >
+          Create Poll
+        </Typography>
+      )}
+      <CreatePoll wallet={wallet}
+                   network={network}
+                   onSend={onSend}
+                   balance={balances}></CreatePoll>
+
       <Box
         sx={{
           maxWidth: 800,
@@ -182,11 +189,6 @@ function Polls(props: any): React.ReactElement {
           setPageNumber(value);
         }}
       />
-
-      <SendMessage wallet={wallet}
-                   network={network}
-                   onSend={onSend}
-                   balance={balances}></SendMessage>
     </Box>
   );
 }

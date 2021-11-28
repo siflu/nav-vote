@@ -132,7 +132,7 @@ function Balance(props: any): React.ReactElement {
         sx={{
           maxWidth: 800,
           width: "90%",
-          bgcolor: "background.default",
+          bgcolor: "background.paper",
           boxShadow: 2,
           borderRadius: 2,
           p: 1,
@@ -258,7 +258,7 @@ function Balance(props: any): React.ReactElement {
         sx={{
           maxWidth: 800,
           width: "90%",
-          bgcolor: "background.default",
+          bgcolor: "background.paper",
           boxShadow: 2,
           borderRadius: 2,
           mt: 2,
@@ -268,7 +268,7 @@ function Balance(props: any): React.ReactElement {
         <List
           sx={{
             maxWidth: 800,
-            bgcolor: "background.default",
+            bgcolor: "background.paper",
             overflow: "hidden",
             flexGrow: 1,
           }}

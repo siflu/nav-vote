@@ -17,7 +17,7 @@ import React from "react";
 
 import SplitButton from "./elements/SplitButton";
 
-export default function SendMessage(props: any): React.ReactElement {
+export default function CreatePoll(props: any): React.ReactElement {
   const {
     addresses,
     balance,
@@ -47,7 +47,6 @@ export default function SendMessage(props: any): React.ReactElement {
       sx={{
         display: "flex",
         width: "100%",
-        height: "100%",
         flexDirection: "column",
       }}
     >

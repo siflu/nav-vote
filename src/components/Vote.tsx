@@ -25,7 +25,7 @@ import nav from "../assets/NAV.png";
 import xnav from "../assets/XNAV.png";
 import Receive from "./Receive";
 import MyUsername from "./MyUsername";
-import SendMessage from "./SendMessage";
+import CreatePoll from "./CreatePoll";
 
 function getWindowDimensions() {
   const { innerWidth: width, innerHeight: height } = window;
@@ -183,10 +183,10 @@ function Vote(props: any): React.ReactElement {
         }}
       />
 
-      <SendMessage wallet={wallet}
+      <CreatePoll wallet={wallet}
                    network={network}
                    onSend={onSend}
-                   balance={balances}></SendMessage>
+                   balance={balances}></CreatePoll>
     </Box>
   );
 }
