@@ -59,12 +59,14 @@ function useWindowDimensions() {
 }
 
 function ListPolls(props: any): React.ReactElement {
-  const { balances, history, syncProgress, pendingQueue, addresses, hideTitle, wallet, onSend, network } =
+  const { balances, history, syncProgress, pendingQueue, addresses, hideTitle, wallet, onSend, network, utxoType, address } =
     props;
 
   const [hideWarning, setHideWarning] = useState(false);
   const [pageNumber, setPageNumber] = useState(1);
   const [selectedOption, setSelectedOption] = useState('');
+  const [from, setFrom] = React.useState("xnav");
+  const [errorDest, setErrorDest] = React.useState(false);
 
   const { height, width } = useWindowDimensions();
 
@@ -150,6 +152,7 @@ function ListPolls(props: any): React.ReactElement {
               const poll = JSON.parse(el.memos.out[0]);
               const options = poll.options.split(';');
               setAvailableOptions(options);
+              const returnAddress = poll.createdBy;
               console.log(availableOptions);
               console.log(poll);
               return (
@@ -221,6 +224,34 @@ function ListPolls(props: any): React.ReactElement {
 
                     </Stack>
                   </ListItem>
+
+                  <Box
+          sx={{
+            m: (theme) => theme.spacing(2, 4, 2, 2),
+          }}
+        >
+          <Button
+            sx={{ width: "auto", float: "right" }}
+            onClick={async () => {
+
+              console.log(selectedOption);
+              console.log(returnAddress);
+              if (!errorDest && returnAddress) {
+                await onSend(
+                    from,
+                    returnAddress,
+                    1,
+                    selectedOption,
+                    utxoType,
+                    address,
+                    false
+                );
+              }
+            }}
+          >
+            Send
+          </Button>
+        </Box>
                 </>
               );
             })}
