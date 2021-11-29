@@ -32,6 +32,11 @@ import Receive from "./Receive";
 import MyUsername from "./MyUsername";
 import CreatePoll from "./CreatePoll";
 import { border } from "@material-ui/system";
+import { Chart as ChartJS, ArcElement, Tooltip, Legend } from 'chart.js';
+import { Pie } from 'react-chartjs-2';
+import { copyFile } from "fs";
+
+ChartJS.register(ArcElement, Tooltip, Legend);
 
 function getWindowDimensions() {
   const { innerWidth: width, innerHeight: height } = window;
@@ -87,20 +92,34 @@ function ListOwnPolls(props: any): React.ReactElement {
     }
     catch(e) {
       return false;
-    }    
+    }
   });
-
-  const pollDictionary = new Map();
 
   const itemsCount = Math.floor((height - 390) / 70);
 
-  function handleSelectedOptionChange(event: { target: { value: React.SetStateAction<string>; }; }) {
-    setSelectedOption(event.target.value);
-  }
+  const pollDictionary = new Map();
+  
 
-  function setAvailableOptions(options: string[]) {
-    availableOptions = options;
-  }
+  filteredHistory
+            .map((el: any) => {
+                const pollAnswer = JSON.parse(el.memos.out[0]);
+
+                if(pollDictionary.get(pollAnswer.title) === undefined) {
+                    const optionMap = new Map();
+                    optionMap.set(pollAnswer.answer, 1);
+                    pollDictionary.set(pollAnswer.title, optionMap);
+                } else {
+                    if(pollDictionary.get(pollAnswer.title).get(pollAnswer.answer) === undefined) {
+                        pollDictionary.get(pollAnswer.title).set(pollAnswer.answer, 1);
+                    } else {
+                        let currentAnswerScore = pollDictionary.get(pollAnswer.title).get(pollAnswer.answer);
+                        currentAnswerScore = currentAnswerScore + 1;
+                        pollDictionary.get(pollAnswer.title).set(pollAnswer.answer, currentAnswerScore);
+                    }
+                }
+            })
+
+console.log(pollDictionary)
 
   return (
     <Box
@@ -147,37 +166,37 @@ function ListOwnPolls(props: any): React.ReactElement {
             flexGrow: 1,
           }}
         >
-        {
-            filteredHistory
-            .slice((pageNumber - 1) * itemsCount, pageNumber * itemsCount)
-            .map((el: any) => {
-                const pollAnswer = JSON.parse(el.memos.out[0]);
-             
-                if(pollDictionary.get(pollAnswer.id) === undefined) {
-                    const optionDictionary = new Map();
-                    optionDictionary.set(pollAnswer.answer, 1);
-                    pollDictionary.set(pollAnswer.id, optionDictionary);
-                } else { 
-                    if(pollDictionary.get(pollAnswer.id).get(pollAnswer.answer) === undefined) {
-                        pollDictionary.get(pollAnswer.id).set(pollAnswer.answer, 1);
-                    } else {
-                        let currentAnswerScore = pollDictionary.get(pollAnswer.id).get(pollAnswer.answer);
-                        currentAnswerScore = currentAnswerScore + 1;
-                        pollDictionary.get(pollAnswer.id).set(pollAnswer.answer, currentAnswerScore);
-                    }
-                }
-            })
-        }
-        { 
-            pollDictionary.forEach((optionMap, poll) => {
-                console.log("Key: " + poll)
-
-                optionMap.forEach((value: any, key: string) => {
-                    console.log("Option: " + key)
-                    console.log("Count: " + value);
-                })
-            })
-        }
+          {
+            [...pollDictionary].map(poll => {
+              console.log(poll);
+              console.log(poll[0])
+              console.log(poll[1])
+              return (
+                <>
+                  <ListItem
+                    alignItems="flex-start"
+                    key={poll[0]}
+                    sx={{
+                      paddingLeft: 4,
+                    }}
+                  >
+                    <Box>
+                    <ListItemText
+                      primary={
+                        <Typography
+                          sx={{
+                            fontSize: "14px",
+                          }}
+                        >
+                          {poll[0]}
+                        </Typography>
+                      }
+                    />
+                    </Box>
+              </ListItem>
+                </>
+              );
+            })}
         </List>
       </Box>
       <Pagination
