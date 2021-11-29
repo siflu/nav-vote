@@ -171,6 +171,37 @@ console.log(pollDictionary)
               console.log(poll);
               console.log(poll[0])
               console.log(poll[1])
+
+              console.log([...poll[1]].map(option => {
+                return(option[0]);
+              }));
+              const data = {
+                labels: [...poll[1]].map(option => { return(option[0]); }),
+                datasets: [
+                  {
+                    label: '# of Votes',
+                    data: [...poll[1]].map(option => { return(option[1]); }),
+                    backgroundColor: [
+                      'rgba(255, 99, 132, 0.2)',
+                      'rgba(54, 162, 235, 0.2)',
+                      'rgba(255, 206, 86, 0.2)',
+                      'rgba(75, 192, 192, 0.2)',
+                      'rgba(153, 102, 255, 0.2)',
+                      'rgba(255, 159, 64, 0.2)',
+                    ],
+                    borderColor: [
+                      'rgba(255, 99, 132, 1)',
+                      'rgba(54, 162, 235, 1)',
+                      'rgba(255, 206, 86, 1)',
+                      'rgba(75, 192, 192, 1)',
+                      'rgba(153, 102, 255, 1)',
+                      'rgba(255, 159, 64, 1)',
+                    ],
+                    borderWidth: 1,
+                  },
+                ],
+              };
+
               return (
                 <>
                   <ListItem
@@ -183,15 +214,41 @@ console.log(pollDictionary)
                     <Box>
                     <ListItemText
                       primary={
-                        <Typography
-                          sx={{
-                            fontSize: "14px",
-                          }}
-                        >
-                          {poll[0]}
-                        </Typography>
+                        <React.Fragment>
+                          <Typography
+                            sx={{
+                              fontSize: "14px",
+                            }}
+                          >
+                            {poll[0]}
+                          </Typography>
+                        </React.Fragment>
+                      }
+                      secondary={
+                        <React.Fragment>
+                          <Typography
+                            sx={{
+                              paddingRight: 4,
+                              textAlign: "right",
+                              fontSize: "12px",
+                            }}
+                            color="text.primary"
+                            variant="body2"
+                          >
+                            {
+                              [...poll[1]].map(option => {
+                               {option.key}
+
+                                
+                              })
+                            }
+                          </Typography>
+                        </React.Fragment>
                       }
                     />
+                    <Pie  
+                      key={poll[0].key}
+                      data={data} />
                     </Box>
               </ListItem>
                 </>
