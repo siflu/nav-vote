@@ -155,6 +155,8 @@ console.log(pollDictionary)
           boxShadow: 1,
           borderRadius: 1,
           mt: 2,
+          mb: 2,
+          pb: 4,
           alignSelf: "center",
         }}
       >
@@ -168,13 +170,6 @@ console.log(pollDictionary)
         >
           {
             [...pollDictionary].map(poll => {
-              console.log(poll);
-              console.log(poll[0])
-              console.log(poll[1])
-
-              console.log([...poll[1]].map(option => {
-                return(option[0]);
-              }));
               const data = {
                 labels: [...poll[1]].map(option => { return(option[0]); }),
                 datasets: [
@@ -209,16 +204,24 @@ console.log(pollDictionary)
                     key={poll[0]}
                     sx={{
                       paddingLeft: 4,
+                      textAlign: "center"
                     }}
                   >
-                    <Box>
+                    <Box sx={{
+                      margin: "auto",
+                      textAlign: "center"
+                    }}>
                     <ListItemText
                       primary={
                         <React.Fragment>
                           <Typography
                             sx={{
-                              fontSize: "14px",
+                              m: 4,
+                              mb: 2,
+                              wordWrap: "break-word",
+                              textAlign: "center",
                             }}
+                            variant={"h5"}
                           >
                             {poll[0]}
                           </Typography>
@@ -256,15 +259,10 @@ console.log(pollDictionary)
             })}
         </List>
       </Box>
-      <Pagination
-        sx={{ mt: 2, mx: "auto" }}
-        count={Math.ceil(filteredHistory.length / itemsCount)}
-        variant="outlined"
-        shape="rounded"
-        onChange={(event: React.ChangeEvent<unknown>, value: number) => {
-          setPageNumber(value);
-        }}
-      />
+      <Box sx={{
+        m: 4
+      }}>
+        </Box>
     </Box>
   );
 }

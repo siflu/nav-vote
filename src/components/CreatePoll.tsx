@@ -111,7 +111,7 @@ export default function CreatePoll(props: any): React.ReactElement {
                   id="destination"
                   label="Destination"
                   value={to}
-                  placeholder="The username we want to write to"
+                  placeholder="The address that you want to send the poll to"
                   fullWidth
                   error={errorDest}
                   InputLabelProps={{
@@ -138,7 +138,7 @@ export default function CreatePoll(props: any): React.ReactElement {
               autoComplete="off"
               id="amount"
               label="Options"
-              placeholder="The possible options, comma separated"
+              placeholder="The possible options, separated by a semicolon (;)"
               fullWidth
               InputLabelProps={{
                 shrink: true,
