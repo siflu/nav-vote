@@ -91,15 +91,6 @@ function Vote(props: any): React.ReactElement {
                             wallet={wallet}
                             network={network}
                             onSend={onSend}></ListPolls>
-      <Pagination
-        sx={{ mt: 2, mx: "auto" }}
-        count={Math.ceil(filteredHistory.length / itemsCount)}
-        variant="outlined"
-        shape="rounded"
-        onChange={(event: React.ChangeEvent<unknown>, value: number) => {
-          setPageNumber(value);
-        }}
-      />
     </Box>
   );
 }

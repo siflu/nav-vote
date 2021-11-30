@@ -83,7 +83,6 @@ function ListOwnPolls(props: any): React.ReactElement {
   const handleClose = () => {
     setAnchorEl(null);
   };
-  let availableOptions: string[];
 
   const filteredHistory = history.filter((el: any) => {
     try {
@@ -95,11 +94,8 @@ function ListOwnPolls(props: any): React.ReactElement {
     }
   });
 
-  const itemsCount = Math.floor((height - 390) / 70);
-
   const pollDictionary = new Map();
   
-
   filteredHistory
             .map((el: any) => {
                 const pollAnswer = JSON.parse(el.memos.out[0]);
@@ -118,8 +114,6 @@ function ListOwnPolls(props: any): React.ReactElement {
                     }
                 }
             })
-
-console.log(pollDictionary)
 
   return (
     <Box

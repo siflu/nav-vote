@@ -144,6 +144,19 @@ function ListPolls(props: any): React.ReactElement {
         }}
       >
         <>
+        <Typography
+          sx={{
+            mt: 4,
+            mb: 2,
+            maxWidth: "100%",
+            wordWrap: "break-word",
+            textAlign: "left",
+          }}
+          variant={"h5"}
+        >
+          Choose the poll that you want to vote on
+        </Typography>
+
           <Select
             labelId="polls"
             id="polls"
@@ -153,8 +166,7 @@ function ListPolls(props: any): React.ReactElement {
             input={<OutlinedInput label="Polls" />}
             displayEmpty
             sx={{
-              mt: 4,
-              width: "100%"
+              mt: 0,
             }}
           >
             {
@@ -163,26 +175,79 @@ function ListPolls(props: any): React.ReactElement {
               ))
             }
           </Select>
-          
+        
           {
             selectedPoll !== '' && (
-              <Select
-                labelId="options"
-                id="options"
-                value={selectedOption}
-                onChange={handleSelectedOptionChange}
-                fullWidth={true}
-                input={<OutlinedInput label="Polls" />}
-                displayEmpty
-                sx={{
-                  mt: 4,
-                  width: "100%"
-                }}
-              >
-                {polls[selectedPoll].options.split(";").map((option: boolean | React.ReactChild | React.ReactFragment | React.ReactPortal | null | undefined, index: string | number | undefined) => (
-                  <MenuItem key={index} value={index}>{option}</MenuItem>
-                ))}
-              </Select>
+              <>
+                <Typography
+                  sx={{
+                    mt: 4,
+                    mb: 2,
+                    maxWidth: "100%",
+                    wordWrap: "break-word",
+                    textAlign: "left",
+                  }}
+                  variant={"h5"}
+                >
+                  Choose your preferred option
+                </Typography>
+
+                <Select
+                  labelId="options"
+                  id="options"
+                  value={selectedOption}
+                  onChange={handleSelectedOptionChange}
+                  fullWidth={true}
+                  input={<OutlinedInput label="Polls" />}
+                  displayEmpty
+                  sx={{
+                    mt: 0,
+                    width: "100%"
+                  }}
+                >
+                  {polls[selectedPoll].options.split(";").map((option: boolean | React.ReactChild | React.ReactFragment | React.ReactPortal | null | undefined, index: string | number | undefined) => (
+                    <MenuItem key={index} value={index}>{option}</MenuItem>
+                  ))}
+                </Select>
+
+                <Box
+                  sx={{
+                    m: (theme) => theme.spacing(2, 4, 2, 2),
+                  }}
+                >
+                  <Button
+                    sx={{ width: "auto", float: "right" }}
+                    onClick={async () => {
+                      const fullSelectedPoll = polls[selectedPoll];
+                      const fullSelectedOption = fullSelectedPoll.options.split(";")[selectedOption];
+
+                      const pollAnswer = {
+                        id: fullSelectedPoll.id,
+                        title: fullSelectedPoll.title,
+                        answer: fullSelectedOption,
+                        createdBy: fullSelectedPoll.createdBy,
+                        validUntil: fullSelectedPoll.validUntil,
+                        isPollAnswer: true
+                      }
+
+                      console.log(fullSelectedPoll)
+                      if (!errorDest && pollAnswer.createdBy) {
+                        await onSend(
+                            from,
+                            pollAnswer.createdBy,
+                            1,
+                            JSON.stringify(pollAnswer),
+                            utxoType,
+                            address,
+                            false
+                        );
+                      }
+                    }}
+                  >
+                    Send
+                  </Button>
+                </Box>
+              </>
             )
           }
           
@@ -190,15 +255,6 @@ function ListPolls(props: any): React.ReactElement {
         </>
           
       </Box>
-      <Pagination
-        sx={{ mt: 2, mx: "auto" }}
-        count={Math.ceil(filteredHistory.length / itemsCount)}
-        variant="outlined"
-        shape="rounded"
-        onChange={(event: React.ChangeEvent<unknown>, value: number) => {
-          setPageNumber(value);
-        }}
-      />
     </Box>
   );
 }
