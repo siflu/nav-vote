@@ -64,9 +64,10 @@ function ListPolls(props: any): React.ReactElement {
 
   const [hideWarning, setHideWarning] = useState(false);
   const [pageNumber, setPageNumber] = useState(1);
-  const [selectedOption, setSelectedOption] = useState('');
   const [from, setFrom] = React.useState("xnav");
   const [errorDest, setErrorDest] = React.useState(false);
+  const [selectedPoll, setSelectedPoll] = useState('');
+  const [selectedOption, setSelectedOption] = useState('');
 
   const { height, width } = useWindowDimensions();
 
@@ -90,9 +91,13 @@ function ListPolls(props: any): React.ReactElement {
     }    
   });
 
+  const polls = filteredHistory.map((el: any) => {
+    return JSON.parse(el.memos.out[0]);
+  });
+  
   const itemsCount = Math.floor((height - 390) / 70);
 
-  function handleSelectedOptionChange(event: { target: { value: React.SetStateAction<string>; }; }) {
+  function handleSelectedOptionChange(event: any) {
     setSelectedOption(event.target.value);
   }
 
@@ -134,133 +139,56 @@ function ListPolls(props: any): React.ReactElement {
           boxShadow: 1,
           borderRadius: 1,
           mt: 2,
+          p: 4,
           alignSelf: "center",
         }}
       >
-        <List
-          sx={{
-            maxWidth: 800,
-            bgcolor: "background.paper",
-            overflow: "hidden",
-            flexGrow: 1,
-          }}
-        >
-          {filteredHistory
-            .slice((pageNumber - 1) * itemsCount, pageNumber * itemsCount)
-            .map((el: any) => {
-              const poll = JSON.parse(el.memos.out[0]);
-              const options = poll.options.split(';');
-              setAvailableOptions(options);
-              const returnAddress = poll.createdBy;
-
-              return (
-                <>
-                  <ListItem
-                    alignItems="flex-start"
-                    key={el.id}
-                    sx={{
-                      paddingLeft: 4,
-                      
-                    }}
-                  >
-                  <Stack 
-                    spacing={2}
-                    sx={{
-                      m: 4,
-                      width: "100%"
-                    }}>  
-                    <ListItemText
-                      primary={
-                        <Typography
-                          sx={{
-                            mt: 4,
-                            mb: 2,
-                            maxWidth: "100%",
-                            width: "100%",
-                            wordWrap: "break-word",
-                            textAlign: "left",
-                          }}
-                          variant={"h5"}
-                        >
-                          {poll.title}
-                        </Typography>
-                      }
-                    />
-                    
-                    <FormControl 
-                    sx={{
-                      mb: 2,
-                      width: "100%",
-                    }}>
-                      <InputLabel id="poll-options"
-                      sx={{
-                        color: "text.primary",
-                      }}>Select option</InputLabel>
-                      
-                      <Select
-                        labelId={"poll-options"}
-                        id="option"
-                        value={selectedOption}
-                        fullWidth={true}
-                        input={<OutlinedInput label="Options" />}
-                        onChange={handleSelectedOptionChange}
-                        displayEmpty
-                        sx={{
-                          width: "100%"
-                        }}
-                      >
-                        {
-                          availableOptions.map(option => {
-                            return (
-                              <MenuItem key={option.trim()} value={option.trim()}>
-                                {option.trim()}
-                              </MenuItem>
-                            );
-                        })}
-                      </Select>
-                      </FormControl>
-
-                    </Stack>
-                  </ListItem>
-
-                  <Box
-          sx={{
-            m: (theme) => theme.spacing(2, 4, 2, 2),
-          }}
-        >
-          <Button
-            sx={{ width: "auto", float: "right" }}
-            onClick={async () => {
-
-              const pollAnswer = {
-                id: poll.id,
-                title: poll.title,
-                answer: selectedOption,
-                createdBy: poll.createdBy,
-                validUntil: poll.validUntil,
-                isPollAnswer: true
-              }
-
-              if (!errorDest && returnAddress) {
-                await onSend(
-                    from,
-                    returnAddress,
-                    1,
-                    JSON.stringify(pollAnswer),
-                    utxoType,
-                    address,
-                    false
-                );
-              }
+        <>
+          <Select
+            labelId="polls"
+            id="polls"
+            value={selectedPoll}
+            onChange={(e) => setSelectedPoll(e.target.value)}
+            fullWidth={true}
+            input={<OutlinedInput label="Polls" />}
+            displayEmpty
+            sx={{
+              mt: 4,
+              width: "100%"
             }}
           >
-            Send
-          </Button>
-        </Box>
-                </>
-              );
-            })}
-        </List>
+            {
+              polls.map(({ title }: any, index: string | number | undefined) => (
+                <MenuItem key={index} value={index}>{title}</MenuItem>
+              ))
+            }
+          </Select>
+          
+          {
+            selectedPoll !== '' && (
+              <Select
+                labelId="options"
+                id="options"
+                value={selectedOption}
+                onChange={handleSelectedOptionChange}
+                fullWidth={true}
+                input={<OutlinedInput label="Polls" />}
+                displayEmpty
+                sx={{
+                  mt: 4,
+                  width: "100%"
+                }}
+              >
+                {polls[selectedPoll].options.split(";").map((option: boolean | React.ReactChild | React.ReactFragment | React.ReactPortal | null | undefined, index: string | number | undefined) => (
+                  <MenuItem key={index} value={index}>{option}</MenuItem>
+                ))}
+              </Select>
+            )
+          }
+          
+        
+        </>
+          
       </Box>
       <Pagination
         sx={{ mt: 2, mx: "auto" }}
