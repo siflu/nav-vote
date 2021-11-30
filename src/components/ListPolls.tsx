@@ -163,7 +163,6 @@ function ListPolls(props: any): React.ReactElement {
             value={selectedPoll}
             onChange={(e) => setSelectedPoll(e.target.value)}
             fullWidth={true}
-            input={<OutlinedInput label="Polls" />}
             displayEmpty
             sx={{
               mt: 0,
@@ -198,7 +197,6 @@ function ListPolls(props: any): React.ReactElement {
                   value={selectedOption}
                   onChange={handleSelectedOptionChange}
                   fullWidth={true}
-                  input={<OutlinedInput label="Polls" />}
                   displayEmpty
                   sx={{
                     mt: 0,
