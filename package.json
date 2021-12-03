@@ -24,7 +24,7 @@
     "localforage": "^1.10.0",
     "material-ui-colors": "^1.0.0",
     "moment": "^2.29.1",
-    "navcoin-js": "^1.0.40",
+    "navcoin-js": "^1.0.41",
     "node-binance-api": "^0.13.0",
     "pouchdb-adapter-node-websql": "^7.0.0",
     "pouchdb-adapter-websql": "^7.0.0",

@@ -355,6 +355,7 @@ class App extends React.Component<any, any> {
         this.setState({ errorPassword: "Wrong password!" });
       }
     };
+    
     if (await this.wallet.GetMasterKey("mnemonic", undefined)) {
       await afterFunc("");
     } else {
