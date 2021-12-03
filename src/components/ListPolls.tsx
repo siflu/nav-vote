@@ -32,6 +32,7 @@ import Receive from "./Receive";
 import MyUsername from "./MyUsername";
 import CreatePoll from "./CreatePoll";
 import { border } from "@material-ui/system";
+import { allowedNodeEnvironmentFlags } from "process";
 
 function getWindowDimensions() {
   const { innerWidth: width, innerHeight: height } = window;
@@ -228,16 +229,16 @@ function ListPolls(props: any): React.ReactElement {
                         isPollAnswer: true
                       }
 
-                      console.log(fullSelectedPoll)
                       if (!errorDest && pollAnswer.createdBy) {
                         await onSend(
                             from,
                             pollAnswer.createdBy,
-                            1,
+                            0 * 1e8,
                             JSON.stringify(pollAnswer),
                             utxoType,
                             address,
-                            false
+                            false,
+                            `Do you really want to vote for ${pollAnswer.answer}?`
                         );
                       }
                     }}

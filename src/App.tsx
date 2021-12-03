@@ -21,6 +21,7 @@ import {
 
 import {
   AccountBalanceOutlined,
+  DnsOutlined,
   MailOutlineOutlined,
   MoveToInboxOutlined,
   PaymentOutlined,
@@ -40,6 +41,9 @@ import Send from "./components/Send";
 import ConfirmTx from "./components/ConfirmTx";
 import Vote from "./components/Vote";
 import Polls from "./components/Polls";
+import DotNav from "./components/DotNav";
+import OpenName from "./components/OpenName";
+import RegisterName from "./components/RegisterName";
 
 themeOptions.spacing(10);
 
@@ -69,6 +73,12 @@ interface IAppState {
   showConfirmTx: boolean;
   toSendTxs: string[];
   blockHeight: number;
+  names: any[];
+  showRegisterName: boolean;
+  errorRegisterName: string;
+  showOpenName: boolean;
+  nameData: any;
+  openedName: string;
 }
 
 interface IWalletHistory {
@@ -108,6 +118,12 @@ const INITIAL_STATE: IAppState = {
   showConfirmTx: false,
   toSendTxs: [],
   blockHeight: -1,
+  names: [],
+  showRegisterName: false,
+  errorRegisterName: "",
+  showOpenName: false,
+  nameData: {},
+  openedName: "",
 };
 
 class App extends React.Component<any, any> {
@@ -198,6 +214,7 @@ class App extends React.Component<any, any> {
           addresses: await this.wallet.GetAllAddresses(),
           history: history,
           walletName: name,
+          names: await this.wallet.GetMyNames(),
         });
 
         await this.wallet.Connect();
@@ -235,6 +252,7 @@ class App extends React.Component<any, any> {
           history,
           utxos: await this.wallet.GetUtxos(0xff),
           addresses: await this.wallet.GetAllAddresses(),
+          names: await this.wallet.GetMyNames(),
         });
         this.setState({ syncProgress: 100, pendingQueue: 0 });
       });
@@ -256,11 +274,27 @@ class App extends React.Component<any, any> {
         this.setState({ blockHeight: height });
       });
 
+      this.wallet.on("new_name", async (name: string, height: number) => {
+        this.setState({ names: await this.wallet.GetMyNames() });
+      });
+
+      this.wallet.on(
+          "update_name",
+          async (name: string, height: number, data: any) => {
+            const { openedName } = this.state;
+
+            if (name == openedName) {
+              this.setState({ nameData: data });
+            }
+          }
+      );
+
       await this.wallet.Load({ bootstrap: this.njs.wallet.xNavBootstrap });
     } catch (e) {
       console.log(e);
     }
   }
+  
 
   public async onRemove(name?: string) {
     const { walletName } = this.state;
@@ -301,6 +335,127 @@ class App extends React.Component<any, any> {
     }
   }
 
+  
+  public onRegisterName = async (name: string) => {
+    const afterFunc = async (password: string) => {
+      const mnemonic: string = await this.wallet.db.GetMasterKey(
+          "mnemonic",
+          password
+      );
+
+      if (mnemonic) {
+        this.setState({
+          showRegisterName: false,
+          askPassword: false,
+          afterPassword: undefined,
+          errorPassword: "",
+        });
+        await this.onRegisterNamePassword(name, password);
+      } else {
+        this.setState({ errorPassword: "Wrong password!" });
+      }
+    };
+    if (await this.wallet.GetMasterKey("mnemonic", undefined)) {
+      await afterFunc("");
+    } else {
+      this.setState({
+        askPassword: true,
+        afterPassword: afterFunc,
+        errorPassword: "",
+      });
+    }
+  };
+
+  public onRegisterNamePassword = async (name: string, password = "") => {
+    try {
+      const txs = await this.wallet.RegisterName(name, password);
+      if (txs) {
+        this.setState({
+          showConfirmTx: true,
+          confirmTxText: `Register ${name} Fee: ${txs.fee / 1e8}`,
+          toSendTxs: txs.tx,
+        });
+      } else {
+        this.setState({
+          errorLoad: "Could not create transaction.",
+          showConfirmTx: false,
+          confirmTxText: "",
+          toSendTxs: [],
+        });
+      }
+    } catch (e: any) {
+      this.setState({
+        errorLoad: e.toString(),
+        showConfirmTx: false,
+        confirmTxText: "",
+        toSendTxs: [],
+      });
+    }
+  };
+
+  public onUpdateName = async (name: string, key: string, value: string) => {
+    const afterFunc = async (password: string) => {
+      const mnemonic: string = await this.wallet.db.GetMasterKey(
+          "mnemonic",
+          password
+      );
+
+      if (mnemonic) {
+        this.setState({
+          askPassword: false,
+          afterPassword: undefined,
+          errorPassword: "",
+        });
+        await this.onUpdateNamePassword(name, key, value, password);
+      } else {
+        this.setState({ errorPassword: "Wrong password!" });
+      }
+    };
+    if (await this.wallet.GetMasterKey("mnemonic", undefined)) {
+      await afterFunc("");
+    } else {
+      this.setState({
+        askPassword: true,
+        afterPassword: afterFunc,
+        errorPassword: "",
+      });
+    }
+  };
+
+  public onUpdateNamePassword = async (
+      name: string,
+      key: string,
+      value: string,
+      password = ""
+  ) => {
+    try {
+      const txs = await this.wallet.UpdateName(name, "", key, value, password);
+      if (txs) {
+        this.setState({
+          showConfirmTx: true,
+          confirmTxText: `Update ${name}: Set ${key} to ${value} - Fee: ${
+              txs.fee / 1e8
+          }`,
+          toSendTxs: txs.tx,
+        });
+      } else {
+        this.setState({
+          errorLoad: "Could not create transaction.",
+          showConfirmTx: false,
+          confirmTxText: "",
+          toSendTxs: [],
+        });
+      }
+    } catch (e: any) {
+      this.setState({
+        errorLoad: e.toString(),
+        showConfirmTx: false,
+        confirmTxText: "",
+        toSendTxs: [],
+      });
+    }
+  };
+
   public onSend = async (
       from: string,
       to: string,
@@ -308,7 +463,8 @@ class App extends React.Component<any, any> {
       memo: string,
       type = 0x1,
       address = undefined,
-      substractFee = true
+      substractFee = true,
+      confirmTxText = undefined
   ) => {
     console.log(`substractFee ${substractFee}`);
     const afterFunc = async (password: string) => {
@@ -323,7 +479,7 @@ class App extends React.Component<any, any> {
           afterPassword: undefined,
           errorPassword: "",
         });
-        await this.onSendPassword(from, to, amount, memo, password, type, address, substractFee);
+        await this.onSendPassword(from, to, amount, memo, password, type, address, substractFee, confirmTxText);
       } else {
         this.setState({ errorPassword: "Wrong password!" });
       }
@@ -347,7 +503,8 @@ class App extends React.Component<any, any> {
       password = "",
       type = 0x1,
       address = undefined,
-      substractFee = true
+      substractFee = true,
+      confirmTxText = undefined
   ) => {
     if (from == "nav" || from == "staked") {
       try {
@@ -402,7 +559,7 @@ class App extends React.Component<any, any> {
         if (txs) {
           this.setState({
             showConfirmTx: true,
-            confirmTxText: `${amount / 1e8} ${from} to ${to} Fee: ${
+            confirmTxText: confirmTxText || `${amount / 1e8} ${from} to ${to} Fee: ${
                 txs.fee / 1e8
             }`,
             toSendTxs: txs.tx,
@@ -448,6 +605,12 @@ class App extends React.Component<any, any> {
       showConfirmTx,
       toSendTxs,
       blockHeight,
+      names,
+      showRegisterName,
+      errorRegisterName,
+      showOpenName,
+      nameData,
+      openedName,
     } = this.state;
 
     return (
@@ -501,6 +664,32 @@ class App extends React.Component<any, any> {
                   });
                 }}
                 error={errorPassword}
+            />
+            <RegisterName
+                open={showRegisterName}
+                onAccept={this.onRegisterName}
+                onClose={() => {
+                  this.setState({
+                    showRegisterName: false,
+                    errorRegisterName: "",
+                  });
+                }}
+                wallet={this.wallet}
+                error={errorRegisterName}
+            />
+            <OpenName
+                open={showOpenName}
+                openedName={openedName}
+                nameData={nameData}
+                onUpdate={this.onUpdateName}
+                onClose={() => {
+                  this.setState({
+                    showOpenName: false,
+                    openedName: "",
+                    nameData: {},
+                  });
+                }}
+                wallet={this.wallet}
             />
             {errorLoad ? (
                 <Error
@@ -572,17 +761,35 @@ class App extends React.Component<any, any> {
                             onSend={this.onSend}
                         />
                     ) : bottomNavigation == 4 ? (
-                        <Vote
-                            addresses={addresses}
-                            balances={balances}
-                            history={history}
-                            syncProgress={syncProgress}
-                            pendingQueue={pendingQueue}
-                            wallet={this.njs.wallet}
-                            network={this.wallet.network}
-                            onSend={this.onSend}
-                        />
-                    ) : bottomNavigation == 5 ? (
+                      <Vote
+                          addresses={addresses}
+                          balances={balances}
+                          history={history}
+                          syncProgress={syncProgress}
+                          pendingQueue={pendingQueue}
+                          wallet={this.njs.wallet}
+                          network={this.wallet.network}
+                          onSend={this.onSend}
+                      />
+                  ) : bottomNavigation == 5 ? (
+                    <DotNav
+                        names={names}
+                        onRegisterName={() => {
+                          this.setState({
+                            showRegisterName: true,
+                          });
+                        }}
+                        onOpenName={async (name: string) => {
+                          const data = await this.wallet.ResolveName(name);
+                          this.setState({
+                            showOpenName: true,
+                            openedName: name,
+                            nameData: data,
+                          });
+                        }}
+                        blockHeight={blockHeight}
+                    />
+                  ) : bottomNavigation == 6 ? (
                       <Settings
                           onClose={() => {
                             this.onClose();
@@ -642,6 +849,10 @@ class App extends React.Component<any, any> {
                       <BottomNavigationAction
                           label="Vote"
                           icon={<MailOutlineOutlined />}
+                      />
+                      <BottomNavigationAction
+                          label="DotNav"
+                          icon={<DnsOutlined />}
                       />
                       <BottomNavigationAction
                           label="Settings"
