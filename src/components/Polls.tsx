@@ -28,6 +28,7 @@ import MyUsername from "./MyUsername";
 import CreatePoll from "./CreatePoll";
 import ListPolls from "./ListPolls";
 import ListOwnPolls from "./ListOwnPolls";
+import ListOwnPolls2 from "./ListOwnPolls2";
 
 function getWindowDimensions() {
   const { innerWidth: width, innerHeight: height } = window;
