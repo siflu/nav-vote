@@ -758,6 +758,7 @@ class App extends React.Component<any, any> {
                             syncProgress={syncProgress}
                             pendingQueue={pendingQueue}
                             wallet={this.njs.wallet}
+                            walletInstance={this.wallet}
                             network={this.wallet.network}
                             onSend={this.onSend}
                         />

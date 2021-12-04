@@ -37,6 +37,7 @@ export default function CreatePoll(props: any): React.ReactElement {
     hideTo,
     hideFrom,
     pollTitle,
+    walletInstance
   } = props
 
   
@@ -114,7 +115,7 @@ export default function CreatePoll(props: any): React.ReactElement {
               <></>
             ) : (
               <>
-                <TextField
+                {/* <TextField
                   autoComplete="off"
                   id="destination"
                   label="Destination"
@@ -138,7 +139,7 @@ export default function CreatePoll(props: any): React.ReactElement {
                       setErrorDest(true);
                     }
                   }}
-                />
+                /> */}
 
 
               <Autocomplete
@@ -204,10 +205,31 @@ export default function CreatePoll(props: any): React.ReactElement {
               if(receiverRef.current) {
 
                 receiverRef.current.forEach(async (element) => {
+
+                  if (wallet.bitcore.Address.isValid(element) || walletInstance.IsValidDotNavName(element.toLowerCase()))
+                  {
+                      let destination = element;
+                      if (walletInstance.IsValidDotNavName(element.toLowerCase())) {
+                        try {
+                          const resolvedName = walletInstance.ResolveName(element.toLowerCase());
+
+                          if (resolvedName["nav"] && wallet.bitcore.Address.isValid(resolvedName["nav"])) {
+                            destination = resolvedName["nav"];
+                          } else {
+                            setErrorDest(true);
+                            return;
+                          }
+                        } catch(e) {
+                          setErrorDest(true);
+                            return;
+                        }
+                      }
+                  }
+
                   if (!errorDest && element) {
                     await onSend(
                         from,
-                        element,
+                        destination,
                         1,
                         JSON.stringify(poll),
                         utxoType,

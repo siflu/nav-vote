@@ -56,7 +56,7 @@ function useWindowDimensions() {
 }
 
 function Polls(props: any): React.ReactElement {
-  const { balances, history, syncProgress, pendingQueue, addresses, hideTitle, wallet, onSend, network } =
+  const { balances, history, syncProgress, pendingQueue, addresses, hideTitle, wallet, onSend, network, walletInstance } =
     props;
 
   const [hideWarning, setHideWarning] = useState(false);
@@ -107,7 +107,8 @@ function Polls(props: any): React.ReactElement {
                    network={network}
                    onSend={onSend}
                    balance={balances}
-                   addresses={addresses}></CreatePoll>
+                   addresses={addresses}
+                   walletInstance={walletInstance}></CreatePoll>
 
       <ListOwnPolls addresses={addresses}
                             balances={balances}
