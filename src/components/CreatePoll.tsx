@@ -12,11 +12,16 @@ import {
   InputLabel,
   OutlinedInput,
   FormControl,
+  TextFieldProps,
+  Chip,
+  Autocomplete,
 } from "@material-ui/core";
-import React, { useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 
 import SplitButton from "./elements/SplitButton";
 import { v4 as uuidv4 } from 'uuid';
+import { ConstructionRounded } from "@material-ui/icons";
+
 
 export default function CreatePoll(props: any): React.ReactElement {
   const {
@@ -32,8 +37,9 @@ export default function CreatePoll(props: any): React.ReactElement {
     hideTo,
     hideFrom,
     pollTitle,
-  } = props;
+  } = props
 
+  
   const [from, setFrom] = React.useState("xnav");
   if (!balance || !balance[from]) return <>Loading</>;
   const [available, setAvailable] = React.useState(
@@ -41,10 +47,12 @@ export default function CreatePoll(props: any): React.ReactElement {
   );
   const [title, setPollTitle] = React.useState(pollTitle);
   const [to, setTo] = React.useState(destination);
-  const [amount, setAmount] = React.useState<number | undefined>(0);
   const [errorDest, setErrorDest] = React.useState(false);
   const [message, setMessage] = React.useState("");
   const [validUntil, setValidUntil] = React.useState<Date | null>(new Date());
+  const myRef = React.createRef();
+  const receiverRef = useRef<string[]>();
+
   
   const poll = {
       id: '',
@@ -131,6 +139,32 @@ export default function CreatePoll(props: any): React.ReactElement {
                     }
                   }}
                 />
+
+
+              <Autocomplete
+                  multiple
+                  id="tags-filled"
+                  options={[]}
+                  defaultValue={[]}
+                  freeSolo
+                  renderTags={(value: any[], getTagProps: (arg0: { index: any; }) => JSX.IntrinsicAttributes) => 
+                    value.map((option: any, index: any) => {
+                      receiverRef.current = value;
+             
+                      return (
+                      <Chip key={index} variant="outlined" label={option} {...getTagProps({ index })} />
+                    )})
+                  }
+                  ref={myRef}
+                  renderInput={(params: any) => (
+                    <TextField
+                      {...params}
+                      label="Receivers"
+                      placeholder="Add a receiver by pressing enter after its dotName or address"               
+                    />
+                  )}
+                  
+                />
               </>
             )}
 
@@ -165,20 +199,25 @@ export default function CreatePoll(props: any): React.ReactElement {
               poll.validUntil = validUntil ?? new Date();
               poll.createdBy = Object.entries(addresses["spending"]["private"]).filter((el: any) => el[1].used === 1 && el[1]["balances"]["xnav"].confirmed > 1)[0][0];
 
-              console.log(JSON.stringify(poll));
-              console.log(poll);
+              console.log(receiverRef.current);
 
-              if (!errorDest && to) {
-                await onSend(
-                    from,
-                    to,
-                    1,
-                    JSON.stringify(poll),
-                    utxoType,
-                    address,
-                    false
-                );
-              }
+              if(receiverRef.current) {
+
+                receiverRef.current.forEach(async (element) => {
+                  if (!errorDest && element) {
+                    await onSend(
+                        from,
+                        element,
+                        1,
+                        JSON.stringify(poll),
+                        utxoType,
+                        address,
+                        false
+                    );
+                  }
+              })
+            }
+              
             }}
           >
             Send
@@ -188,4 +227,8 @@ export default function CreatePoll(props: any): React.ReactElement {
     </Box>
   );
 }
+
+
+
+
 
