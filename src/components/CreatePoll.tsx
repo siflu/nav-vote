@@ -153,7 +153,11 @@ export default function CreatePoll(props: any): React.ReactElement {
                       receiverRef.current = value;
              
                       return (
-                      <Chip key={index} variant="outlined" label={option} {...getTagProps({ index })} />
+                      <Chip 
+                        key={index} 
+                        variant="outlined" 
+                        label={option} {...getTagProps({ index })} 
+                        />
                     )})
                   }
                   ref={myRef}
@@ -161,7 +165,8 @@ export default function CreatePoll(props: any): React.ReactElement {
                     <TextField
                       {...params}
                       label="Receivers"
-                      placeholder="Add a receiver by pressing enter after its dotName or address"               
+                      placeholder="Add a receiver by pressing enter after its dotName or address" 
+                      error={errorDest}              
                     />
                   )}
                   
@@ -200,46 +205,42 @@ export default function CreatePoll(props: any): React.ReactElement {
               poll.validUntil = validUntil ?? new Date();
               poll.createdBy = Object.entries(addresses["spending"]["private"]).filter((el: any) => el[1].used === 1 && el[1]["balances"]["xnav"].confirmed > 1)[0][0];
 
-              console.log(receiverRef.current);
+              setErrorDest(false)
+              let hasErrors = false;
 
               if(receiverRef.current) {
-
                 receiverRef.current.forEach(async (element) => {
-
                   if (wallet.bitcore.Address.isValid(element) || walletInstance.IsValidDotNavName(element.toLowerCase()))
-                  {
-                      let destination = element;
+                  {                 
                       if (walletInstance.IsValidDotNavName(element.toLowerCase())) {
+                  
                         try {
                           const resolvedName = walletInstance.ResolveName(element.toLowerCase());
 
                           if (resolvedName["nav"] && wallet.bitcore.Address.isValid(resolvedName["nav"])) {
-                            destination = resolvedName["nav"];
+                            // all good, do nothing                  
                           } else {
                             setErrorDest(true);
-                            return;
+                            hasErrors = true;
                           }
                         } catch(e) {
                           setErrorDest(true);
-                            return;
+                          hasErrors = true;
                         }
                       }
                   }
-
-                  if (!errorDest && element) {
-                    await onSend(
-                        from,
-                        destination,
-                        1,
-                        JSON.stringify(poll),
-                        utxoType,
-                        address,
-                        false
-                    );
+                  else {
+                    setErrorDest(true);
+                    hasErrors = true;
                   }
-              })
-            }
-              
+                })
+
+                if(!hasErrors) {
+                  console.log("Kein FEhler - senden!")
+                } else {
+                  console.log("FEHLER!!!")
+                }              
+              }       
             }}
           >
             Send
