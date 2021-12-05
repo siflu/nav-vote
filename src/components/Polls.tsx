@@ -110,14 +110,14 @@ function Polls(props: any): React.ReactElement {
                    addresses={addresses}
                    walletInstance={walletInstance}></CreatePoll>
 
-      <ListOwnPolls addresses={addresses}
+      <ListOwnPolls2 addresses={addresses}
                             balances={balances}
                             history={history}
                             syncProgress={syncProgress}
                             pendingQueue={pendingQueue}
                             wallet={wallet}
                             network={network}
-                            onSend={onSend}></ListOwnPolls>
+                            onSend={onSend}></ListOwnPolls2>
 
             <Pagination
               sx={{ mt: 2, mx: "auto" }}

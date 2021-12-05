@@ -59,7 +59,7 @@ export default function CreatePoll(props: any): React.ReactElement {
           borderRadius: 1,
           mt: 2,
 
-          p: 2,
+          p: 4,
           pt: 4,
           alignSelf: "center",
           alignItems: "center",
@@ -180,9 +180,6 @@ export default function CreatePoll(props: any): React.ReactElement {
                 validUntil: new Date(),
                 isPoll: true
             }
-          
-              console.log(poll);
-              console.log(receivers)
               setErrorDest(false)
               let hasDestErrors = false;
               let hasOptionsErrors = false;

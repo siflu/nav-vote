@@ -76,6 +76,11 @@ function ListOwnPolls2(props: any): React.ReactElement {
                 }
             });
 
+  const pollTitles = Array.from(pollDictionary.keys());
+  
+  console.log("Polltitles: " + pollTitles)
+  console.log(pollDictionary)
+
   return (
     <Box
       sx={{
@@ -111,7 +116,7 @@ function ListOwnPolls2(props: any): React.ReactElement {
           borderRadius: 1,
           mt: 2,
           mb: 2,
-          pb: 4,
+          p: 4,
           alignSelf: "center",
         }}
       >
@@ -129,7 +134,7 @@ function ListOwnPolls2(props: any): React.ReactElement {
             Choose the poll that you want to view
           </Typography>
 
-            {/* <Select
+            <Select
               labelId="polls"
               id="polls"
               value={selectedPoll}
@@ -140,20 +145,15 @@ function ListOwnPolls2(props: any): React.ReactElement {
                 mt: 0,
               }}
             >
-              {
-                [...pollDictionary].map(({poll}:any, index: string | number | undefined) => {
-                  
-                  (
-                  <MenuItem key={poll} value={index}>{index}</MenuItem>
-                )
-              })
-              }
-            </Select> */}
             {
-                Object.keys([...pollDictionary]).map(key => {
-                  console.log(pollDictionary.get(key))
-                })
+              pollTitles.map(pollTitle => {
+                return (
+                  <MenuItem key={pollTitle} value={pollTitle}>{pollTitle}</MenuItem>
+                )
+              })              
             }
+            </Select>
+            
         </>
       </Box>
       <Box sx={{
