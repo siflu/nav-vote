@@ -28,7 +28,6 @@ export default function CreatePoll(props: any): React.ReactElement {
     walletInstance
   } = props
 
-  
   const [from, setFrom] = React.useState("xnav");
   if (!balance || !balance[from]) return <>Loading</>;
   const [available, setAvailable] = React.useState(
@@ -42,7 +41,6 @@ export default function CreatePoll(props: any): React.ReactElement {
   const [validUntil, setValidUntil] = React.useState<Date | null>(new Date());
   const [options, setOptions] = React.useState<(string | never[])[]>([]);
   const [receivers, setReceivers] = React.useState<(string | never[])[]>([]);
-
 
   return (
     
@@ -102,7 +100,7 @@ export default function CreatePoll(props: any): React.ReactElement {
                 options={[]}
                 defaultValue={[]}
                 freeSolo
-                onChange={(e, value) => setReceivers((state) => value)}
+                onChange={(e, value) => setReceivers(() => value)}
                 renderTags={(
                   value: any[],
                   getTagProps: (arg0: { index: any }) => JSX.IntrinsicAttributes
@@ -184,43 +182,82 @@ export default function CreatePoll(props: any): React.ReactElement {
             }
           
               console.log(poll);
-
+              console.log(receivers)
               setErrorDest(false)
               let hasDestErrors = false;
+              let hasOptionsErrors = false;
 
-                receivers.forEach(async (element) => {
-                  if (wallet.bitcore.Address.isValid(element) || walletInstance.IsValidDotNavName(element))
-                  {                 
-                      if (walletInstance.IsValidDotNavName(element)) {
-                  
-                        try {
-                          const resolvedName = walletInstance.ResolveName(element);
+              // CHECK FOR ERRORS IN THE RECEIVERS
+              receivers.forEach(async (element) => {
+                if (wallet.bitcore.Address.isValid(element) || walletInstance.IsValidDotNavName(element))
+                {
+                    if (walletInstance.IsValidDotNavName(element)) {
+                
+                      try {
+                        const resolvedName = await walletInstance.ResolveName(element);
 
-                          if (resolvedName["nav"] && wallet.bitcore.Address.isValid(resolvedName["nav"])) {
-                            // all good, do nothing                  
-                          } else {
-                            setErrorDest(true);
-                            hasDestErrors = true;
-                          }
-                        } catch(e) {
+                        if (resolvedName["nav"] && wallet.bitcore.Address.isValid(resolvedName["nav"])) {
+                          // all good, do nothing     
+                        } else {
                           setErrorDest(true);
                           hasDestErrors = true;
+                          return;
                         }
+                      } catch(e) {
+                        setErrorDest(true);
+                        hasDestErrors = true;
+                        return;
                       }
-                  }
-                  else {
-                    setErrorDest(true);
-                    hasDestErrors = true;
+                    }
+                }
+                else {
+                  setErrorDest(true);
+                  hasDestErrors = true;
+                  return;
+                }
+              })
+
+              // CHECK FOR ERRORS IN THE OPTIONS
+              if(options.length < 1) {
+                hasOptionsErrors = true
+                setErrorOptions(true)
+              }
+
+              console.log("has dest errors: " + hasDestErrors + " has option errors: " + hasOptionsErrors)
+              if(!hasDestErrors && !hasOptionsErrors) {
+                console.log("no errors")
+                receivers.forEach(async (element) => {
+                  let destination = element;
+
+                  if (wallet.bitcore.Address.isValid(element) || walletInstance.IsValidDotNavName(element))
+                  {
+                    if (walletInstance.IsValidDotNavName(element)) {
+                      try {
+                        const resolvedName = await walletInstance.ResolveName(element);
+
+                        if (resolvedName["nav"] && wallet.bitcore.Address.isValid(resolvedName["nav"])) {
+                          destination = resolvedName["nav"]
+                        } 
+                      } catch(e) {
+                        return;
+                      }
+                    }
+
+                    console.log("destination " + destination)
+                    await onSend(
+                      from,
+                      destination,
+                      1,
+                      JSON.stringify(poll),
+                      utxoType,
+                      address,
+                      false
+                    );
                   }
                 })
-
-                if(!hasDestErrors) {
-                  console.log("Kein FEhler - senden!")
-                } else {
-                  console.log("FEHLER!!!")
-                }              
-              }
+              }           
             }
+          }
           >
             Send
           </Button>

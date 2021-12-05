@@ -78,7 +78,7 @@ function DotNav(props: any): React.ReactElement {
             sx={{
               maxWidth: 800,
               bgcolor: "background.paper",
-              overflow: "scroll",
+              overflow: "hidden",
               flexGrow: 1,
             }}
           >

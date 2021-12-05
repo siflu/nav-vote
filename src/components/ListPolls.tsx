@@ -204,7 +204,7 @@ function ListPolls(props: any): React.ReactElement {
                     width: "100%"
                   }}
                 >
-                  {polls[selectedPoll].options.split(";").map((option: boolean | React.ReactChild | React.ReactFragment | React.ReactPortal | null | undefined, index: string | number | undefined) => (
+                  {polls[selectedPoll].options.map((option: boolean | React.ReactChild | React.ReactFragment | React.ReactPortal | null | undefined, index: string | number | undefined) => (
                     <MenuItem key={index} value={index}>{option}</MenuItem>
                   ))}
                 </Select>
@@ -218,7 +218,7 @@ function ListPolls(props: any): React.ReactElement {
                     sx={{ width: "auto", float: "right" }}
                     onClick={async () => {
                       const fullSelectedPoll = polls[selectedPoll];
-                      const fullSelectedOption = fullSelectedPoll.options.split(";")[selectedOption];
+                      const fullSelectedOption = fullSelectedPoll.options[selectedOption];
 
                       const pollAnswer = {
                         id: fullSelectedPoll.id,
