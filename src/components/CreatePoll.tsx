@@ -1,26 +1,14 @@
 import {
   Box,
   Button,
-  Divider,
-  MenuItem,
-  Select,
   Stack,
   TextField,
-  Typography,
-  InputAdornment,
-  IconButton,
-  InputLabel,
-  OutlinedInput,
-  FormControl,
-  TextFieldProps,
   Chip,
   Autocomplete,
 } from "@material-ui/core";
-import React, { useEffect, useRef, useState } from "react";
+import React from "react";
 
-import SplitButton from "./elements/SplitButton";
 import { v4 as uuidv4 } from 'uuid';
-import { ConstructionRounded } from "@material-ui/icons";
 
 
 export default function CreatePoll(props: any): React.ReactElement {
@@ -49,20 +37,12 @@ export default function CreatePoll(props: any): React.ReactElement {
   const [title, setPollTitle] = React.useState(pollTitle);
   const [to, setTo] = React.useState(destination);
   const [errorDest, setErrorDest] = React.useState(false);
+  const [errorOptions, setErrorOptions] = React.useState(false);
   const [message, setMessage] = React.useState("");
   const [validUntil, setValidUntil] = React.useState<Date | null>(new Date());
-  const myRef = React.createRef();
-  const receiverRef = useRef<string[]>();
+  const [options, setOptions] = React.useState<(string | never[])[]>([]);
+  const [receivers, setReceivers] = React.useState<(string | never[])[]>([]);
 
-  
-  const poll = {
-      id: '',
-      title: '',
-      options: '',
-      createdBy: '',
-      validUntil: new Date(),
-      isPoll: true
-  }
 
   return (
     
@@ -115,78 +95,73 @@ export default function CreatePoll(props: any): React.ReactElement {
               <></>
             ) : (
               <>
-                {/* <TextField
-                  autoComplete="off"
-                  id="destination"
-                  label="Destination"
-                  value={to}
-                  placeholder="The address that you want to send the poll to"
-                  fullWidth
-                  error={errorDest}
-                  InputLabelProps={{
-                    shrink: true,
-                  }}
-                  onChange={(e) => {
-                    if (wallet.bitcore.Address.isValid(e.target.value)) {
-                      setTo(e.target.value);
-                      setErrorDest(false);
-                    } else {
-                      console.log(
-                        wallet.bitcore.Address.getValidationError(
-                          e.target.value
-                        )
-                      );
-                      setErrorDest(true);
-                    }
-                  }}
-                /> */}
-
-
+              {/* RECEIVERS */}
               <Autocomplete
-                  multiple
-                  id="tags-filled"
-                  options={[]}
-                  defaultValue={[]}
-                  freeSolo
-                  renderTags={(value: any[], getTagProps: (arg0: { index: any; }) => JSX.IntrinsicAttributes) => 
-                    value.map((option: any, index: any) => {
-                      receiverRef.current = value;
-             
-                      return (
-                      <Chip 
-                        key={index} 
-                        variant="outlined" 
-                        label={option} {...getTagProps({ index })} 
-                        />
-                    )})
-                  }
-                  ref={myRef}
-                  renderInput={(params: any) => (
-                    <TextField
-                      {...params}
-                      label="Receivers"
-                      placeholder="Add a receiver by pressing enter after its dotName or address" 
-                      error={errorDest}              
-                    />
-                  )}
-                  
-                />
+                multiple
+                id="tags-filled"
+                options={[]}
+                defaultValue={[]}
+                freeSolo
+                onChange={(e, value) => setReceivers((state) => value)}
+                renderTags={(
+                  value: any[],
+                  getTagProps: (arg0: { index: any }) => JSX.IntrinsicAttributes
+                ) =>
+                  value.map((option: any, index: any) => {
+                    return (
+                      <Chip
+                        key={index}
+                        variant="outlined"
+                        label={option}
+                        {...getTagProps({ index })}
+                      />
+                    );
+                  })
+                }
+                renderInput={(params: any) => (
+                  <TextField
+                    {...params}
+                    label="Receivers"
+                    placeholder="Add a receiver by pressing enter after its dotName or address"
+                    error={errorDest}
+                  />
+                )}
+              />
               </>
             )}
-
-            <TextField
-              autoComplete="off"
-              id="amount"
-              label="Options"
-              placeholder="The possible options, separated by a semicolon (;)"
-              fullWidth
-              InputLabelProps={{
-                shrink: true,
-              }}
-              value={message}
-              onChange={(e) => {
-                setMessage(e.target.value);
-              }}
+             
+            
+            {/* Options */}
+            <Autocomplete
+              multiple
+              id="tags-filled"
+              options={[]}
+              defaultValue={[]}
+              freeSolo
+              onChange={(e, value) => setOptions(value)}
+              renderTags={(
+                value: any[],
+                getTagProps: (arg0: { index: any }) => JSX.IntrinsicAttributes
+              ) =>
+                value.map((option: any, index: any) => {
+                  return (
+                    <Chip
+                      key={index}
+                      variant="outlined"
+                      label={option}
+                      {...getTagProps({ index })}
+                    />
+                  );
+                })
+              }
+              renderInput={(params: any) => (
+                <TextField
+                  {...params}
+                  label="Options"
+                  placeholder="Add an option by pressing enter"
+                  error={errorOptions}
+                />
+              )}
             />
           </Stack>
         </Box>
@@ -199,49 +174,53 @@ export default function CreatePoll(props: any): React.ReactElement {
             sx={{ width: "auto", float: "right" }}
             onClick={async () => {
 
-              poll.id = uuidv4();
-              poll.title = title;
-              poll.options = message;
-              poll.validUntil = validUntil ?? new Date();
-              poll.createdBy = Object.entries(addresses["spending"]["private"]).filter((el: any) => el[1].used === 1 && el[1]["balances"]["xnav"].confirmed > 1)[0][0];
+              const poll = {
+                id: uuidv4(),
+                title: title,
+                options: options,
+                createdBy: Object.entries(addresses["spending"]["private"]).filter((el: any) => el[1].used === 1 && el[1]["balances"]["xnav"].confirmed > 1)[0][0],
+                validUntil: new Date(),
+                isPoll: true
+            }
+          
+              console.log(poll);
 
               setErrorDest(false)
-              let hasErrors = false;
+              let hasDestErrors = false;
 
-              if(receiverRef.current) {
-                receiverRef.current.forEach(async (element) => {
-                  if (wallet.bitcore.Address.isValid(element) || walletInstance.IsValidDotNavName(element.toLowerCase()))
+                receivers.forEach(async (element) => {
+                  if (wallet.bitcore.Address.isValid(element) || walletInstance.IsValidDotNavName(element))
                   {                 
-                      if (walletInstance.IsValidDotNavName(element.toLowerCase())) {
+                      if (walletInstance.IsValidDotNavName(element)) {
                   
                         try {
-                          const resolvedName = walletInstance.ResolveName(element.toLowerCase());
+                          const resolvedName = walletInstance.ResolveName(element);
 
                           if (resolvedName["nav"] && wallet.bitcore.Address.isValid(resolvedName["nav"])) {
                             // all good, do nothing                  
                           } else {
                             setErrorDest(true);
-                            hasErrors = true;
+                            hasDestErrors = true;
                           }
                         } catch(e) {
                           setErrorDest(true);
-                          hasErrors = true;
+                          hasDestErrors = true;
                         }
                       }
                   }
                   else {
                     setErrorDest(true);
-                    hasErrors = true;
+                    hasDestErrors = true;
                   }
                 })
 
-                if(!hasErrors) {
+                if(!hasDestErrors) {
                   console.log("Kein FEhler - senden!")
                 } else {
                   console.log("FEHLER!!!")
                 }              
-              }       
-            }}
+              }
+            }
           >
             Send
           </Button>
