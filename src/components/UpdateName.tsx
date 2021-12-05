@@ -1,15 +1,7 @@
 import * as React from "react";
 import Button from "@material-ui/core/Button";
-import Dialog from "@material-ui/core/Dialog";
-import DialogTitle from "@material-ui/core/DialogTitle";
-import DialogContent from "@material-ui/core/DialogContent";
-import DialogActions from "@material-ui/core/DialogActions";
-import IconButton from "@material-ui/core/IconButton";
-import CloseIcon from "@material-ui/icons/Close";
 import Typography from "@material-ui/core/Typography";
-import ContentCopyIcon from "@material-ui/icons/ContentCopy";
-import { Box, Input, Paper, TextField } from "@material-ui/core";
-import { CopyToClipboard } from "react-copy-to-clipboard";
+import { Box, TextField } from "@material-ui/core";
 import { useState } from "react";
 
 export default function UpdateName(props: any) {
@@ -52,7 +44,7 @@ export default function UpdateName(props: any) {
         value={value}
         sx={{ mx: 0, mt: 2, width: "100%", minWidth: 300 }}
         onChange={(e) => {
-          setValue(e.target.value.toLowerCase());
+          setValue(e.target.value);
         }}
       />
 

@@ -1,28 +1,13 @@
 import React, { useState, useEffect } from "react";
 import {
-  Alert,
-  Avatar,
   Box,
   Button,
-  IconButton,
-  LinearProgress,
   List,
   ListItem,
-  ListItemAvatar,
-  ListItemIcon,
   ListItemText,
-  Menu,
-  MenuItem,
   Pagination,
   Typography,
 } from "@material-ui/core";
-
-import { ExpandMoreOutlined } from "@material-ui/icons";
-
-import staking from "../assets/earn_staking.png";
-import swap from "../assets/swap_xnav.png";
-import nav from "../assets/NAV.png";
-import xnav from "../assets/XNAV.png";
 
 function getWindowDimensions() {
   const { innerWidth: width, innerHeight: height } = window;
@@ -51,14 +36,9 @@ function useWindowDimensions() {
 
 function DotNav(props: any): React.ReactElement {
   const { names, onRegisterName, onOpenName, blockHeight } = props;
-
   const [pageNumber, setPageNumber] = useState(1);
-
   const { height, width } = useWindowDimensions();
-
   const itemsCount = Math.floor((height - 390) / 70);
-
-  console.log("***************************** " + names);
 
   return (
     <>
@@ -98,7 +78,7 @@ function DotNav(props: any): React.ReactElement {
             sx={{
               maxWidth: 800,
               bgcolor: "background.paper",
-              overflow: "hidden",
+              overflow: "scroll",
               flexGrow: 1,
             }}
           >
@@ -129,7 +109,7 @@ function DotNav(props: any): React.ReactElement {
                           <Typography sx={{ fontSize: "12px" }}>
                             {blockHeight - el.height > 6
                               ? "Mature"
-                              : "Immature"}
+                              : `Immature (${(el.height + 6) - blockHeight} blocks left)`}
                           </Typography>
                         }
                       />

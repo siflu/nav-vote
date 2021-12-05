@@ -424,15 +424,16 @@ class App extends React.Component<any, any> {
   };
 
   public onUpdateNamePassword = async (
-      name: string,
-      key: string,
-      value: string,
-      password = ""
+    name: string,
+    key: string,
+    value: string,
+    password = ""
   ) => {
     try {
       const txs = await this.wallet.UpdateName(name, "", key, value, password);
       if (txs) {
         this.setState({
+          showOpenName: false,
           showConfirmTx: true,
           confirmTxText: `Update ${name}: Set ${key} to ${value} - Fee: ${
               txs.fee / 1e8
