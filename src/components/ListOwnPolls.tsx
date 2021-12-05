@@ -1,40 +1,16 @@
 import React, { useState, useEffect } from "react";
 import {
-  Alert,
-  Avatar,
   Box,
-  Button,
-  FormControl,
-  IconButton,
-  InputLabel,
-  LinearProgress,
   List,
   ListItem,
-  ListItemAvatar,
-  ListItemIcon,
   ListItemText,
-  Menu,
   MenuItem,
-  OutlinedInput,
-  Pagination,
   Select,
-  Stack,
   Typography,
 } from "@material-ui/core";
 
-import { ExpandMoreOutlined } from "@material-ui/icons";
-
-import staking from "../assets/earn_staking.png";
-import swap from "../assets/swap_xnav.png";
-import nav from "../assets/NAV.png";
-import xnav from "../assets/XNAV.png";
-import Receive from "./Receive";
-import MyUsername from "./MyUsername";
-import CreatePoll from "./CreatePoll";
-import { border } from "@material-ui/system";
 import { Chart as ChartJS, ArcElement, Tooltip, Legend } from 'chart.js';
 import { Pie } from 'react-chartjs-2';
-import { copyFile } from "fs";
 
 ChartJS.register(ArcElement, Tooltip, Legend);
 
@@ -64,25 +40,10 @@ function useWindowDimensions() {
 }
 
 function ListOwnPolls(props: any): React.ReactElement {
-  const { balances, history, syncProgress, pendingQueue, addresses, hideTitle, wallet, onSend, network, utxoType, address } =
+  const { history, hideTitle } =
     props;
 
-  const [hideWarning, setHideWarning] = useState(false);
-  const [pageNumber, setPageNumber] = useState(1);
-  const [selectedOption, setSelectedOption] = useState('');
-  const [from, setFrom] = React.useState("xnav");
-  const [errorDest, setErrorDest] = React.useState(false);
-
-  const { height, width } = useWindowDimensions();
-
-  const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
-  const open = Boolean(anchorEl);
-  const handleClick = (event: React.MouseEvent<HTMLButtonElement>) => {
-    setAnchorEl(event.currentTarget);
-  };
-  const handleClose = () => {
-    setAnchorEl(null);
-  };
+  const [selectedPoll, setSelectedPoll] = useState('');
 
   const filteredHistory = history.filter((el: any) => {
     try {
@@ -113,7 +74,9 @@ function ListOwnPolls(props: any): React.ReactElement {
                         pollDictionary.get(pollAnswer.title).set(pollAnswer.answer, currentAnswerScore);
                     }
                 }
-            })
+            });
+
+  const pollTitles = Array.from(pollDictionary.keys());
 
   return (
     <Box
@@ -150,108 +113,143 @@ function ListOwnPolls(props: any): React.ReactElement {
           borderRadius: 1,
           mt: 2,
           mb: 2,
-          pb: 4,
+          p: 4,
           alignSelf: "center",
         }}
       >
-        <List
-          sx={{
-            maxWidth: 800,
-            bgcolor: "background.paper",
-            overflow: "hidden",
-            flexGrow: 1,
-          }}
-        >
-          {
-            [...pollDictionary].map(poll => {
-              const data = {
-                labels: [...poll[1]].map(option => { return(option[0]); }),
-                datasets: [
-                  {
-                    label: '# of Votes',
-                    data: [...poll[1]].map(option => { return(option[1]); }),
-                    backgroundColor: [
-                      'rgba(10, 135, 245, .8)',
-                      'rgba(114, 81, 214, .8)',
-                      'rgba(220, 30, 185, .8)',
-                      'rgba(240, 240, 240, .8)',
-                      'rgba(251, 153, 2, .8)',
-                      'rgba(254, 39, 18, 0.8)',
-                    ],
-                    borderColor: [
-                      'rgba(10, 135, 245, .8)',
-                      'rgba(114, 81, 214, .8)',
-                      'rgba(220, 30, 185, .8)',
-                      'rgba(220, 220, 220, .8)',
-                      'rgba(251, 153, 2, .8)',
-                      'rgba(254, 39, 18, 0.8)',
-                    ],
-                    borderWidth: 1,
-                  },
-                ],
-              };
+        <>
+          <Typography
+            sx={{
+              mt: 4,
+              mb: 2,
+              maxWidth: "100%",
+              wordWrap: "break-word",
+              textAlign: "left",
+            }}
+            variant={"h5"}
+          >
+            Choose the poll that you want to view
+          </Typography>
 
-              return (
-                <>
-                  <ListItem
-                    alignItems="flex-start"
-                    key={poll[0]}
-                    sx={{
-                      paddingLeft: 4,
-                      textAlign: "center"
-                    }}
-                  >
-                    <Box sx={{
-                      margin: "auto",
-                      textAlign: "center"
-                    }}>
-                    <ListItemText
-                      primary={
-                        <React.Fragment>
-                          <Typography
-                            sx={{
-                              m: 4,
-                              mb: 2,
-                              wordWrap: "break-word",
-                              textAlign: "center",
-                            }}
-                            variant={"h5"}
-                          >
-                            {poll[0]}
-                          </Typography>
-                        </React.Fragment>
-                      }
-                      secondary={
-                        <React.Fragment>
-                          <Typography
-                            sx={{
-                              paddingRight: 4,
-                              textAlign: "right",
-                              fontSize: "12px",
-                            }}
-                            color="text.primary"
-                            variant="body2"
-                          >
-                            {
-                              [...poll[1]].map(option => {
-                               {option.key}
+            <Select
+              labelId="polls"
+              id="polls"
+              value={selectedPoll}
+              onChange={(e) => setSelectedPoll(e.target.value)}
+              fullWidth={true}
+              displayEmpty
+              sx={{
+                mt: 0,
+              }}
+            >
+            {
+              pollTitles.map(pollTitle => {
+                return (
+                  <MenuItem key={pollTitle} value={pollTitle}>{pollTitle}</MenuItem>
+                )
+              })              
+            }
+            </Select>
 
-                                
-                              })
-                            }
-                          </Typography>
-                        </React.Fragment>
-                      }
-                    />
-                    <Pie  
-                      key={poll[0].key}
-                      data={data} />
-                    </Box>
-              </ListItem>
-                </>
-              );
-            })}
-        </List>
+            <List
+              sx={{
+                maxWidth: 800,
+                bgcolor: "background.paper",
+                overflow: "hidden",
+                flexGrow: 1,
+              }}
+            >
+              {
+                Array.from([...pollDictionary].values()).filter(poll => poll[0] === selectedPoll).map(poll => {
+                  const data = {
+                    labels: [...poll[1]].map(option => { return(option[0]); }),
+                    datasets: [
+                      {
+                        label: '# of Votes',
+                        data: [...poll[1]].map(option => { return(option[1]); }),
+                        backgroundColor: [
+                          'rgba(10, 135, 245, .8)',
+                          'rgba(114, 81, 214, .8)',
+                          'rgba(220, 30, 185, .8)',
+                          'rgba(240, 240, 240, .8)',
+                          'rgba(251, 153, 2, .8)',
+                          'rgba(254, 39, 18, 0.8)',
+                        ],
+                        borderColor: [
+                          'rgba(10, 135, 245, .8)',
+                          'rgba(114, 81, 214, .8)',
+                          'rgba(220, 30, 185, .8)',
+                          'rgba(220, 220, 220, .8)',
+                          'rgba(251, 153, 2, .8)',
+                          'rgba(254, 39, 18, 0.8)',
+                        ],
+                        borderWidth: 1,
+                      },
+                    ],
+                  };
+
+                  return (
+                    <>
+                      <ListItem
+                        alignItems="flex-start"
+                        key={poll[0]}
+                        sx={{
+                          paddingLeft: 4,
+                          textAlign: "center"
+                        }}
+                      >
+                        <Box sx={{
+                          margin: "auto",
+                          textAlign: "center"
+                        }}>
+                        <ListItemText
+                          primary={
+                            <React.Fragment>
+                              <Typography
+                                sx={{
+                                  m: 4,
+                                  mb: 3,
+                                  wordWrap: "break-word",
+                                  textAlign: "center",
+                                }}
+                                variant={"h5"}
+                              >
+                                {poll[0]}
+                              </Typography>
+                            </React.Fragment>
+                          }
+                          secondary={
+                            <React.Fragment>
+                              <Typography
+                                sx={{
+                                  paddingRight: 4,
+                                  textAlign: "right",
+                                  fontSize: "12px",
+                                }}
+                                color="text.primary"
+                                variant="body2"
+                              >
+                                {
+                                  [...poll[1]].map(option => {
+                                   {option.key}
+                                  })
+                                }
+                              </Typography>
+                            </React.Fragment>
+                          }
+                        />
+                        <Pie  
+                          key={poll[0].key}
+                          data={data} />
+                        </Box>
+                  </ListItem>
+                    </>
+                  );
+                })
+              }
+            </List>
+            
+        </>
       </Box>
       <Box sx={{
         m: 4
