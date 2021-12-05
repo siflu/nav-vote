@@ -554,6 +554,7 @@ class App extends React.Component<any, any> {
           password,
           substractFee)
       try {
+        console.log(`xNavCreateTransaction: to: ${to} amount: ${amount} memo: ${memo} password: ${password} subtractFee: ${substractFee}`)
         const txs = await this.wallet.xNavCreateTransaction(
             to,
             amount,
