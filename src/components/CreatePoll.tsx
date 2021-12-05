@@ -223,10 +223,8 @@ export default function CreatePoll(props: any): React.ReactElement {
                 setErrorOptions(true)
               }
 
-              console.log("has dest errors: " + hasDestErrors + " has option errors: " + hasOptionsErrors)
               if(!hasDestErrors && !hasOptionsErrors) {
-                console.log("no errors")
-                receivers.forEach(async (element) => {
+                receivers.forEach(async element => {
                   let destination = element;
 
                   if (wallet.bitcore.Address.isValid(element) || walletInstance.IsValidDotNavName(element))
@@ -243,7 +241,6 @@ export default function CreatePoll(props: any): React.ReactElement {
                       }
                     }
 
-                    console.log("destination " + destination)
                     await onSend(
                       from,
                       destination,
@@ -251,6 +248,8 @@ export default function CreatePoll(props: any): React.ReactElement {
                       JSON.stringify(poll),
                       utxoType,
                       address,
+                      false,
+                      undefined,
                       false
                     );
                   }

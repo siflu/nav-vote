@@ -466,7 +466,8 @@ class App extends React.Component<any, any> {
       type = 0x1,
       address = undefined,
       substractFee = true,
-      confirmTxText = undefined
+      confirmTxText = undefined,
+      showConfirmTx = true
   ) => {
     console.log(`substractFee ${substractFee}`);
     const afterFunc = async (password: string) => {
@@ -481,7 +482,7 @@ class App extends React.Component<any, any> {
           afterPassword: undefined,
           errorPassword: "",
         });
-        await this.onSendPassword(from, to, amount, memo, password, type, address, substractFee, confirmTxText);
+        await this.onSendPassword(from, to, amount, memo, password, type, address, substractFee, confirmTxText, showConfirmTx);
       } else {
         this.setState({ errorPassword: "Wrong password!" });
       }
@@ -506,7 +507,8 @@ class App extends React.Component<any, any> {
       type = 0x1,
       address = undefined,
       substractFee = true,
-      confirmTxText = undefined
+      confirmTxText = undefined,
+      showConfirmTx = true
   ) => {
     if (from == "nav" || from == "staked") {
       try {
@@ -521,14 +523,15 @@ class App extends React.Component<any, any> {
             address
         );
         if (txs) {
-          this.setState({
-            showConfirmTx: true,
-            confirmTxText: `${amount / 1e8} ${from} to ${to} Fee: ${
-                txs.fee / 1e8
-            }`,
-            toSendTxs: txs.tx,
-          });
-        } else {
+            this.setState({
+              showConfirmTx: true,
+              confirmTxText: `${amount / 1e8} ${from} to ${to} Fee: ${
+                  txs.fee / 1e8
+              }`,
+              toSendTxs: txs.tx,
+            });
+        }
+        else {
           this.setState({
             errorLoad: "Could not create transaction.",
             showConfirmTx: false,
@@ -559,13 +562,33 @@ class App extends React.Component<any, any> {
             substractFee
         );
         if (txs) {
-          this.setState({
-            showConfirmTx: true,
-            confirmTxText: confirmTxText || `${amount / 1e8} ${from} to ${to} Fee: ${
-                txs.fee / 1e8
-            }`,
-            toSendTxs: txs.tx,
-          });
+          if (showConfirmTx) {
+            this.setState({
+              showConfirmTx: true,
+              confirmTxText: confirmTxText || `${amount / 1e8} ${from} to ${to} Fee: ${
+                  txs.fee / 1e8
+              }`,
+              toSendTxs: txs.tx,
+            });
+          } else {
+            try {
+              console.log("SHOW NO CONFIRM")
+              this.wallet.SendTransaction(txs.tx);
+            } catch (e: any) {
+              this.setState({
+                errorLoad: e.toString(),
+                showConfirmTx: false,
+                confirmTxText: "",
+                toSendTxs: [],
+              });
+            }
+            this.setState({
+              confirmTxText: "",
+              showConfirmTx: false,
+              toSendTxs: [],
+              //bottomNavigation: 4,
+            });
+          }
         } else {
           this.setState({
             errorLoad: "Could not create transaction.",
@@ -651,7 +674,7 @@ class App extends React.Component<any, any> {
                     confirmTxText: "",
                     showConfirmTx: false,
                     toSendTxs: [],
-                    bottomNavigation: 4,
+                    //bottomNavigation: 4,
                   });
                 }}
             />
