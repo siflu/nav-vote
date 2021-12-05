@@ -1,38 +1,11 @@
 import React, { useState, useEffect } from "react";
 import {
-  Alert,
-  Avatar,
   Box,
   Button,
-  FormControl,
-  IconButton,
-  InputLabel,
-  LinearProgress,
-  List,
-  ListItem,
-  ListItemAvatar,
-  ListItemIcon,
-  ListItemText,
-  Menu,
   MenuItem,
-  OutlinedInput,
-  Pagination,
   Select,
-  Stack,
   Typography,
 } from "@material-ui/core";
-
-import { ExpandMoreOutlined } from "@material-ui/icons";
-
-import staking from "../assets/earn_staking.png";
-import swap from "../assets/swap_xnav.png";
-import nav from "../assets/NAV.png";
-import xnav from "../assets/XNAV.png";
-import Receive from "./Receive";
-import MyUsername from "./MyUsername";
-import CreatePoll from "./CreatePoll";
-import { border } from "@material-ui/system";
-import { allowedNodeEnvironmentFlags } from "process";
 
 function getWindowDimensions() {
   const { innerWidth: width, innerHeight: height } = window;
@@ -60,26 +33,16 @@ function useWindowDimensions() {
 }
 
 function ListPolls(props: any): React.ReactElement {
-  const { balances, history, syncProgress, pendingQueue, addresses, hideTitle, wallet, onSend, network, utxoType, address } =
+  const { history, hideTitle, onSend, utxoType, address } =
     props;
 
-  const [hideWarning, setHideWarning] = useState(false);
-  const [pageNumber, setPageNumber] = useState(1);
   const [from, setFrom] = React.useState("xnav");
   const [errorDest, setErrorDest] = React.useState(false);
   const [selectedPoll, setSelectedPoll] = useState('');
   const [selectedOption, setSelectedOption] = useState('');
-
   const { height, width } = useWindowDimensions();
-
   const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
-  const open = Boolean(anchorEl);
-  const handleClick = (event: React.MouseEvent<HTMLButtonElement>) => {
-    setAnchorEl(event.currentTarget);
-  };
-  const handleClose = () => {
-    setAnchorEl(null);
-  };
+
   let availableOptions: string[];
 
   const filteredHistory = history.filter((el: any) => {
@@ -96,14 +59,8 @@ function ListPolls(props: any): React.ReactElement {
     return JSON.parse(el.memos.out[0]);
   });
   
-  const itemsCount = Math.floor((height - 390) / 70);
-
   function handleSelectedOptionChange(event: any) {
     setSelectedOption(event.target.value);
-  }
-
-  function setAvailableOptions(options: string[]) {
-    availableOptions = options;
   }
 
   return (
