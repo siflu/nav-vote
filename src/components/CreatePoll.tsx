@@ -5,11 +5,12 @@ import {
   TextField,
   Chip,
   Autocomplete,
+  Snackbar,
+  Alert,
 } from "@material-ui/core";
 import React from "react";
-
+import MuiAlert from '@mui/material/Alert';
 import { v4 as uuidv4 } from 'uuid';
-
 
 export default function CreatePoll(props: any): React.ReactElement {
   const {
@@ -37,10 +38,23 @@ export default function CreatePoll(props: any): React.ReactElement {
   const [to, setTo] = React.useState(destination);
   const [errorDest, setErrorDest] = React.useState(false);
   const [errorOptions, setErrorOptions] = React.useState(false);
-  const [message, setMessage] = React.useState("");
   const [validUntil, setValidUntil] = React.useState<Date | null>(new Date());
   const [options, setOptions] = React.useState<(string | never[])[]>([]);
   const [receivers, setReceivers] = React.useState<(string | never[])[]>([]);
+  const [open, setOpen] = React.useState(false);
+
+  const handleClose = (event: any, reason: string) => {
+    if (reason === 'clickaway') {
+      return;
+    }
+
+    setOpen(false);
+  };
+
+  function delay(ms: number) {
+    return new Promise( resolve => setTimeout(resolve, ms) );
+}
+
 
   return (
     
@@ -237,11 +251,17 @@ export default function CreatePoll(props: any): React.ReactElement {
                         return;
                       }
                     }
+                    
+                    
+                    while((await walletInstance.GetBalance()).xnav.confirmed === 0) {
+                      console.log("waiting...")
+                      await delay(1000);
+                    }
 
                     await onSend(
                       from,
                       destination,
-                      1,
+                      0 * 1e8,
                       JSON.stringify(poll),
                       utxoType,
                       address,
@@ -249,14 +269,32 @@ export default function CreatePoll(props: any): React.ReactElement {
                       undefined,
                       false
                     );
+
+                    await delay(500);
                   }
                 })
+
+                // Snackbar
+                setOpen(true);
               }           
             }
           }
           >
             Send
           </Button>
+
+          <Snackbar 
+            open={open} 
+            autoHideDuration={6000} 
+            onClose={handleClose}
+            anchorOrigin={{
+              vertical: "top",
+              horizontal: "center"
+              }} >
+            <Alert severity="success" sx={{ width: '100%' }}>
+              Poll successfully sent!
+            </Alert>
+          </Snackbar>
         </Box>
       </Box>
     </Box>
