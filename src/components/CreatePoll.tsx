@@ -16,7 +16,7 @@ export default function CreatePoll(props: any): React.ReactElement {
   const {
     addresses,
     balance,
-    onSend,
+    onSendMultiple,
     wallet,
     network,
     destination,
@@ -197,18 +197,31 @@ export default function CreatePoll(props: any): React.ReactElement {
               setErrorDest(false)
               let hasDestErrors = false;
               let hasOptionsErrors = false;
+              const destinations: { dest: string; amount: number; memo: string; }[] = [];
 
-              // CHECK FOR ERRORS IN THE RECEIVERS
+              // CHECK FOR ERRORS IN THE OPTIONS
+              if(options.length < 1) {
+                hasOptionsErrors = true
+                setErrorOptions(true)
+              }
+
+              // CHECK FOR ERRORS IN THE RECEIVERS AND ADD TO DESTINATIONS IF OK
               receivers.forEach(async (element) => {
                 if (wallet.bitcore.Address.isValid(element) || walletInstance.IsValidDotNavName(element))
                 {
                     if (walletInstance.IsValidDotNavName(element)) {
-                
                       try {
                         const resolvedName = await walletInstance.ResolveName(element);
 
                         if (resolvedName["nav"] && wallet.bitcore.Address.isValid(resolvedName["nav"])) {
-                          // all good, do nothing     
+                          // valid dotNav name, add to destinations
+                          destinations.push(
+                            {
+                              dest: resolvedName["nav"],
+                              amount: 1 * 1e8,
+                              memo: JSON.stringify(poll),
+                            }
+                          )                         
                         } else {
                           setErrorDest(true);
                           hasDestErrors = true;
@@ -219,6 +232,19 @@ export default function CreatePoll(props: any): React.ReactElement {
                         hasDestErrors = true;
                         return;
                       }
+                    } else {
+                      // valid nav address, add to destinations
+                      console.log("ELEMENT")
+                      console.log(element)
+                      console.log("-----")
+                      
+                      destinations.push(
+                        {
+                          dest: element.toString(),
+                          amount: 1 * 1e8,
+                          memo: JSON.stringify(poll),
+                        }
+                      )
                     }
                 }
                 else {
@@ -228,57 +254,30 @@ export default function CreatePoll(props: any): React.ReactElement {
                 }
               })
 
-              // CHECK FOR ERRORS IN THE OPTIONS
-              if(options.length < 1) {
-                hasOptionsErrors = true
-                setErrorOptions(true)
-              }
-
+              
               if(!hasDestErrors && !hasOptionsErrors) {
-                receivers.forEach(async element => {
-                  let destination = element;
+                while((await walletInstance.GetBalance()).xnav.confirmed === 0) {
+                  console.log("waiting...")
+                  await delay(1000);
+                }
 
-                  if (wallet.bitcore.Address.isValid(element) || walletInstance.IsValidDotNavName(element))
-                  {
-                    if (walletInstance.IsValidDotNavName(element)) {
-                      try {
-                        const resolvedName = await walletInstance.ResolveName(element);
+                console.log("CreatePoll")
+                console.log(destinations)
+                await onSendMultiple(
+                  from,
+                  destinations,
+                  true,
+                  "Test"
+                );
 
-                        if (resolvedName["nav"] && wallet.bitcore.Address.isValid(resolvedName["nav"])) {
-                          destination = resolvedName["nav"]
-                        } 
-                      } catch(e) {
-                        return;
-                      }
-                    }
-                    
-                    
-                    while((await walletInstance.GetBalance()).xnav.confirmed === 0) {
-                      console.log("waiting...")
-                      await delay(1000);
-                    }
+                await delay(500);
+              }
+                  
 
-                    await onSend(
-                      from,
-                      destination,
-                      0 * 1e8,
-                      JSON.stringify(poll),
-                      utxoType,
-                      address,
-                      false,
-                      undefined,
-                      false
-                    );
-
-                    await delay(500);
-                  }
-                })
-
-                // Snackbar
-                setOpen(true);
-              }           
+              // Snackbar
+              setOpen(true);
             }
-          }
+         }
           >
             Send
           </Button>

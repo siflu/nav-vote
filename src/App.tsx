@@ -466,8 +466,7 @@ class App extends React.Component<any, any> {
       type = 0x1,
       address = undefined,
       substractFee = true,
-      confirmTxText = undefined,
-      showConfirmTx = true
+      confirmTxText = undefined
   ) => {
     console.log(`substractFee ${substractFee}`);
     const afterFunc = async (password: string) => {
@@ -482,7 +481,7 @@ class App extends React.Component<any, any> {
           afterPassword: undefined,
           errorPassword: "",
         });
-        await this.onSendPassword(from, to, amount, memo, password, type, address, substractFee, confirmTxText, showConfirmTx);
+        await this.onSendPassword(from, to, amount, memo, password, type, address, substractFee, confirmTxText);
       } else {
         this.setState({ errorPassword: "Wrong password!" });
       }
@@ -507,8 +506,7 @@ class App extends React.Component<any, any> {
       type = 0x1,
       address = undefined,
       substractFee = true,
-      confirmTxText = undefined,
-      showConfirmTx = true
+      confirmTxText = undefined
   ) => {
     if (from == "nav" || from == "staked") {
       try {
@@ -563,33 +561,13 @@ class App extends React.Component<any, any> {
             substractFee
         );
         if (txs) {
-          if (showConfirmTx) {
-            this.setState({
-              showConfirmTx: true,
-              confirmTxText: confirmTxText || `${amount / 1e8} ${from} to ${to} Fee: ${
-                  txs.fee / 1e8
-              }`,
-              toSendTxs: txs.tx,
-            });
-          } else {
-            try {
-              console.log("SHOW NO CONFIRM")
-              this.wallet.SendTransaction(txs.tx);
-            } catch (e: any) {
-              this.setState({
-                errorLoad: e.toString(),
-                showConfirmTx: false,
-                confirmTxText: "",
-                toSendTxs: [],
-              });
-            }
-            this.setState({
-              confirmTxText: "",
-              showConfirmTx: false,
-              toSendTxs: [],
-              //bottomNavigation: 4,
-            });
-          }
+          this.setState({
+            showConfirmTx: true,
+            confirmTxText: confirmTxText || `${amount / 1e8} ${from} to ${to} Fee: ${
+                txs.fee / 1e8
+            }`,
+            toSendTxs: txs.tx,
+          });
         } else {
           this.setState({
             errorLoad: "Could not create transaction.",
@@ -608,6 +586,84 @@ class App extends React.Component<any, any> {
       }
     }
   };
+
+  public onSendMultiple = async (
+    from: string,
+    destinations: { dest: string; amount: number; memo: string; }[],
+    subtractFee = true,
+    confirmTxText = undefined
+  ) => {
+    console.log("onSendMultiple")
+    console.log(destinations)
+    const afterFunc = async (password: string) => {
+      const mnemonic: string = await this.wallet.db.GetMasterKey(
+          "mnemonic",
+          password
+      );
+
+      if (mnemonic) {
+        this.setState({
+          askPassword: false,
+          afterPassword: undefined,
+          errorPassword: "",
+        });
+        await this.onSendPasswordMultiple(from, destinations, password, subtractFee, confirmTxText);
+      } else {
+        this.setState({ errorPassword: "Wrong password!" });
+      }
+    };
+    if (await this.wallet.GetMasterKey("mnemonic", undefined)) {
+      await afterFunc("");
+    } else {
+      this.setState({
+        askPassword: true,
+        afterPassword: afterFunc,
+        errorPassword: "",
+      });
+    } 
+  };
+  
+  public onSendPasswordMultiple = async (
+    from: string,
+    destinations: { dest: string; amount: number; memo: string; }[],
+    password = "",
+    subtractFee = true,
+    confirmTxText = undefined
+  ) => {
+    if (from == "xnav") {
+      console.log(destinations)
+    try {
+      console.log(`xNavCreateTransactionMultiple`)
+      console.log(destinations)
+      const txs = await this.wallet.xNavCreateTransactionMultiple(
+          destinations,
+          password,
+          subtractFee
+      );
+      if (txs) {
+        this.setState({
+          showConfirmTx: confirmTxText ? true : false,
+          confirmTxText: confirmTxText || "",
+          toSendTxs: txs.tx,
+        });
+      } else {
+        this.setState({
+          errorLoad: "Could not create transaction.",
+          showConfirmTx: false,
+          confirmTxText: "",
+          toSendTxs: [],
+        });
+      }
+    } catch (e: any) {
+      this.setState({
+        errorLoad: e.toString(),
+        showConfirmTx: false,
+        confirmTxText: "",
+        toSendTxs: [],
+      });
+    }
+    }
+  }
 
   public render = () => {
     const {
@@ -786,6 +842,7 @@ class App extends React.Component<any, any> {
                             walletInstance={this.wallet}
                             network={this.wallet.network}
                             onSend={this.onSend}
+                            onSendMultiple={this.onSendMultiple}
                         />
                     ) : bottomNavigation == 4 ? (
                       <Vote
