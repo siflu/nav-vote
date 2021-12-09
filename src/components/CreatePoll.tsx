@@ -11,6 +11,7 @@ import {
 import React from "react";
 import MuiAlert from '@mui/material/Alert';
 import { v4 as uuidv4 } from 'uuid';
+import { constants } from "fs";
 
 export default function CreatePoll(props: any): React.ReactElement {
   const {
@@ -193,7 +194,7 @@ export default function CreatePoll(props: any): React.ReactElement {
                 createdBy: Object.entries(addresses["spending"]["private"]).filter((el: any) => el[1].used === 1 && el[1]["balances"]["xnav"].confirmed > 1)[0][0],
                 validUntil: new Date(),
                 isPoll: true
-            }
+              }
               setErrorDest(false)
               let hasDestErrors = false;
               let hasOptionsErrors = false;
@@ -215,6 +216,7 @@ export default function CreatePoll(props: any): React.ReactElement {
 
                         if (resolvedName["nav"] && wallet.bitcore.Address.isValid(resolvedName["nav"])) {
                           // valid dotNav name, add to destinations
+                          console.log("Valid dotNav name")
                           destinations.push(
                             {
                               dest: resolvedName["nav"],
@@ -234,7 +236,7 @@ export default function CreatePoll(props: any): React.ReactElement {
                       }
                     } else {
                       // valid nav address, add to destinations
-                      console.log("ELEMENT")
+                      console.log("Valid nav address")
                       console.log(element)
                       console.log("-----")
                       
@@ -263,19 +265,17 @@ export default function CreatePoll(props: any): React.ReactElement {
 
                 console.log("CreatePoll")
                 console.log(destinations)
+              
+                await delay(2000)
                 await onSendMultiple(
                   from,
                   destinations,
                   true,
-                  "Test"
+                  `Do you really want to send the poll?`
                 );
 
-                await delay(500);
+                //await delay(500);
               }
-                  
-
-              // Snackbar
-              setOpen(true);
             }
          }
           >
