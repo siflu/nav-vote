@@ -207,12 +207,12 @@ export default function CreatePoll(props: any): React.ReactElement {
               }
 
               // CHECK FOR ERRORS IN THE RECEIVERS AND ADD TO DESTINATIONS IF OK
-              receivers.forEach(async (element) => {
-                if (wallet.bitcore.Address.isValid(element) || walletInstance.IsValidDotNavName(element))
+              await Promise.all(receivers.map(async (rec) => {
+                if (wallet.bitcore.Address.isValid(rec) || walletInstance.IsValidDotNavName(rec))
                 {
-                    if (walletInstance.IsValidDotNavName(element)) {
+                    if (walletInstance.IsValidDotNavName(rec)) {
                       try {
-                        const resolvedName = await walletInstance.ResolveName(element);
+                        const resolvedName = await walletInstance.ResolveName(rec);
 
                         if (resolvedName["nav"] && wallet.bitcore.Address.isValid(resolvedName["nav"])) {
                           // valid dotNav name, add to destinations
@@ -237,12 +237,12 @@ export default function CreatePoll(props: any): React.ReactElement {
                     } else {
                       // valid nav address, add to destinations
                       console.log("Valid nav address")
-                      console.log(element)
+                      console.log(rec)
                       console.log("-----")
                       
                       destinations.push(
                         {
-                          dest: element.toString(),
+                          dest: rec.toString(),
                           amount: 1 * 1e8,
                           memo: JSON.stringify(poll),
                         }
@@ -254,8 +254,7 @@ export default function CreatePoll(props: any): React.ReactElement {
                   hasDestErrors = true;
                   return;
                 }
-              })
-
+              }));
               
               if(!hasDestErrors && !hasOptionsErrors) {
                 while((await walletInstance.GetBalance()).xnav.confirmed === 0) {
@@ -266,15 +265,12 @@ export default function CreatePoll(props: any): React.ReactElement {
                 console.log("CreatePoll")
                 console.log(destinations)
               
-                await delay(2000)
                 await onSendMultiple(
                   from,
                   destinations,
                   true,
                   `Do you really want to send the poll?`
                 );
-
-                //await delay(500);
               }
             }
          }
