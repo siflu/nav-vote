@@ -9,9 +9,7 @@ import {
   Alert,
 } from "@material-ui/core";
 import React from "react";
-import MuiAlert from '@mui/material/Alert';
 import { v4 as uuidv4 } from 'uuid';
-import { constants } from "fs";
 
 export default function CreatePoll(props: any): React.ReactElement {
   const {
@@ -19,22 +17,14 @@ export default function CreatePoll(props: any): React.ReactElement {
     balance,
     onSendMultiple,
     wallet,
-    network,
     destination,
-    utxoType,
-    address,
-    hideTitle,
     hideTo,
-    hideFrom,
     pollTitle,
     walletInstance
   } = props
 
   const [from, setFrom] = React.useState("xnav");
   if (!balance || !balance[from]) return <>Loading</>;
-  const [available, setAvailable] = React.useState(
-    balance[from].confirmed / 1e8
-  );
   const [title, setPollTitle] = React.useState(pollTitle);
   const [to, setTo] = React.useState(destination);
   const [errorDest, setErrorDest] = React.useState(false);
@@ -54,7 +44,35 @@ export default function CreatePoll(props: any): React.ReactElement {
 
   function delay(ms: number) {
     return new Promise( resolve => setTimeout(resolve, ms) );
-}
+  }
+
+  async function getValidVoters(): Promise<any[]> {
+    const validVoters = new Array<any>();
+
+    await Promise.all(receivers.map(async (rec) => {
+      if (wallet.bitcore.Address.isValid(rec) || walletInstance.IsValidDotNavName(rec))
+      {
+        let voterAddress;
+          if (walletInstance.IsValidDotNavName(rec)) {
+            try {
+              const resolvedName = await walletInstance.ResolveName(rec);
+
+              if (resolvedName["nav"] && wallet.bitcore.Address.isValid(resolvedName["nav"])) {
+                voterAddress = resolvedName["nav"]
+                validVoters.push(voterAddress);                         
+              }
+            } catch(e) {
+              return;
+            }
+          } else {
+            voterAddress = rec.toString()
+            validVoters.push(voterAddress);                         
+          }
+      }
+    }));
+
+    return validVoters;
+  }
 
 
   return (
@@ -187,14 +205,19 @@ export default function CreatePoll(props: any): React.ReactElement {
             sx={{ width: "auto", float: "right" }}
             onClick={async () => {
 
+              const validVoters = await getValidVoters();
+
               const poll = {
                 id: uuidv4(),
                 title: title,
                 options: options,
                 createdBy: Object.entries(addresses["spending"]["private"]).filter((el: any) => el[1].used === 1 && el[1]["balances"]["xnav"].confirmed > 1)[0][0],
                 validUntil: new Date(),
-                isPoll: true
+                isPoll: true,
+                validVoters: validVoters,
               }
+
+
               setErrorDest(false)
               let hasDestErrors = false;
               let hasOptionsErrors = false;
@@ -210,20 +233,14 @@ export default function CreatePoll(props: any): React.ReactElement {
               await Promise.all(receivers.map(async (rec) => {
                 if (wallet.bitcore.Address.isValid(rec) || walletInstance.IsValidDotNavName(rec))
                 {
+                  let voterAddress;
                     if (walletInstance.IsValidDotNavName(rec)) {
                       try {
                         const resolvedName = await walletInstance.ResolveName(rec);
 
                         if (resolvedName["nav"] && wallet.bitcore.Address.isValid(resolvedName["nav"])) {
                           // valid dotNav name, add to destinations
-                          console.log("Valid dotNav name")
-                          destinations.push(
-                            {
-                              dest: resolvedName["nav"],
-                              amount: 1 * 1e8,
-                              memo: JSON.stringify(poll),
-                            }
-                          )                         
+                          voterAddress = resolvedName["nav"]
                         } else {
                           setErrorDest(true);
                           hasDestErrors = true;
@@ -236,18 +253,14 @@ export default function CreatePoll(props: any): React.ReactElement {
                       }
                     } else {
                       // valid nav address, add to destinations
-                      console.log("Valid nav address")
-                      console.log(rec)
-                      console.log("-----")
-                      
-                      destinations.push(
-                        {
-                          dest: rec.toString(),
-                          amount: 1 * 1e8,
-                          memo: JSON.stringify(poll),
-                        }
-                      )
+                      voterAddress = rec.toString()
                     }
+
+                    destinations.push({
+                        dest: voterAddress,
+                        amount: 1 * 1e8,
+                        memo: JSON.stringify(poll),
+                    });
                 }
                 else {
                   setErrorDest(true);
@@ -261,10 +274,8 @@ export default function CreatePoll(props: any): React.ReactElement {
                   console.log("waiting...")
                   await delay(1000);
                 }
-
-                console.log("CreatePoll")
-                console.log(destinations)
               
+                console.log(destinations)
                 await onSendMultiple(
                   from,
                   destinations,

@@ -48,7 +48,7 @@ function ListOwnPolls(props: any): React.ReactElement {
   const filteredHistory = history.filter((el: any) => {
     try {
       const poll = JSON.parse(el.memos.out[0]);
-      return poll.isPollAnswer;
+      return poll.isPollAnswer && poll.validVoters.includes(poll.votedBy);
     }
     catch(e) {
       return false;
