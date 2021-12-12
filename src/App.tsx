@@ -79,6 +79,8 @@ interface IAppState {
   showOpenName: boolean;
   nameData: any;
   openedName: string;
+  pollId: string;
+  pollInformationsToSave: Map<string, any[]>;
 }
 
 interface IWalletHistory {
@@ -124,6 +126,8 @@ const INITIAL_STATE: IAppState = {
   showOpenName: false,
   nameData: {},
   openedName: "",
+  pollId: "",
+  pollInformationsToSave: new Map<string, any[]>()
 };
 
 class App extends React.Component<any, any> {
@@ -591,10 +595,10 @@ class App extends React.Component<any, any> {
     from: string,
     destinations: { dest: string; amount: number; memo: string; }[],
     subtractFee = true,
-    confirmTxText = undefined
+    confirmTxText = undefined,
+    pollId = "",
+    pollInformationsToSave = undefined
   ) => {
-    console.log("onSendMultiple")
-    console.log(destinations)
     const afterFunc = async (password: string) => {
       const mnemonic: string = await this.wallet.db.GetMasterKey(
           "mnemonic",
@@ -607,7 +611,7 @@ class App extends React.Component<any, any> {
           afterPassword: undefined,
           errorPassword: "",
         });
-        await this.onSendPasswordMultiple(from, destinations, password, subtractFee, confirmTxText);
+        await this.onSendPasswordMultiple(from, destinations, password, subtractFee, confirmTxText, pollId, pollInformationsToSave);
       } else {
         this.setState({ errorPassword: "Wrong password!" });
       }
@@ -628,13 +632,12 @@ class App extends React.Component<any, any> {
     destinations: { dest: string; amount: number; memo: string; }[],
     password = "",
     subtractFee = true,
-    confirmTxText = undefined
+    confirmTxText = undefined,
+    pollId = "",
+    pollInformationsToSave = undefined
   ) => {
     if (from == "xnav") {
-      console.log(destinations)
     try {
-      console.log(`xNavCreateTransactionMultiple`)
-      console.log(destinations)
       const txs = await this.wallet.xNavCreateTransactionMultiple(
           destinations,
           password,
@@ -645,6 +648,8 @@ class App extends React.Component<any, any> {
           showConfirmTx: confirmTxText ? true : false,
           confirmTxText: confirmTxText || "",
           toSendTxs: txs.tx,
+          pollId: pollId,
+          pollInformationsToSave: pollInformationsToSave
         });
       } else {
         this.setState({
@@ -718,6 +723,11 @@ class App extends React.Component<any, any> {
                 }}
                 onOk={() => {
                   try {
+                    if(this.state.pollId && this.state.pollInformationsToSave.size > 0) {
+                      console.log(this.state.pollId)
+                      console.log(this.state.pollInformationsToSave)
+                      this.wallet.db.SetValue(this.state.pollId, this.state.pollInformationsToSave);
+                    }
                     this.wallet.SendTransaction(toSendTxs);
                   } catch (e: any) {
                     this.setState({

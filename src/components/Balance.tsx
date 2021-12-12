@@ -67,8 +67,6 @@ function Balance(props: any): React.ReactElement {
     setAnchorEl(null);
   };
 
-  console.log(history);
-
   const itemsCount = Math.floor((height - 390) / 70);
 
   return (

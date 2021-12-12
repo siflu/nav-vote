@@ -15,35 +15,15 @@ function getWindowDimensions() {
   };
 }
 
-function useWindowDimensions() {
-  const [windowDimensions, setWindowDimensions] = useState(
-    getWindowDimensions()
-  );
-
-  useEffect(() => {
-    function handleResize() {
-      setWindowDimensions(getWindowDimensions());
-    }
-
-    window.addEventListener("resize", handleResize);
-    return () => window.removeEventListener("resize", handleResize);
-  }, []);
-
-  return windowDimensions;
-}
 
 function ListPolls(props: any): React.ReactElement {
-  const { history, hideTitle, onSend, utxoType, address } =
+  const { history, hideTitle, onSend, utxoType, addresses, walletInstance, wallet } =
     props;
 
   const [from, setFrom] = React.useState("xnav");
   const [errorDest, setErrorDest] = React.useState(false);
   const [selectedPoll, setSelectedPoll] = useState('');
   const [selectedOption, setSelectedOption] = useState('');
-  const { height, width } = useWindowDimensions();
-  const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
-
-  let availableOptions: string[];
 
   const filteredHistory = history.filter((el: any) => {
     try {
@@ -176,6 +156,9 @@ function ListPolls(props: any): React.ReactElement {
                     onClick={async () => {
                       const fullSelectedPoll = polls[selectedPoll];
                       const fullSelectedOption = fullSelectedPoll.options[selectedOption];
+                      const votingAddress = Object.entries(addresses["spending"]["private"]).filter((el: any) => {
+                        return fullSelectedPoll.validVoters.includes(el[0]);
+                      })[0][0]
 
                       const pollAnswer = {
                         id: fullSelectedPoll.id,
@@ -183,7 +166,9 @@ function ListPolls(props: any): React.ReactElement {
                         answer: fullSelectedOption,
                         createdBy: fullSelectedPoll.createdBy,
                         validUntil: fullSelectedPoll.validUntil,
-                        isPollAnswer: true
+                        isPollAnswer: true,
+                        votedBy: votingAddress,
+                        version: "v1.0"
                       }
 
                       if (!errorDest && pollAnswer.createdBy) {
@@ -193,7 +178,7 @@ function ListPolls(props: any): React.ReactElement {
                             0 * 1e8,
                             JSON.stringify(pollAnswer),
                             utxoType,
-                            address,
+                            undefined,
                             false,
                             `Do you really want to vote for ${pollAnswer.answer}?`
                         );
