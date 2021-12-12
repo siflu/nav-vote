@@ -1,82 +1,81 @@
 import React, { useState, useEffect } from "react";
 import {
   Box,
+  Button,
   List,
   ListItem,
   ListItemText,
   MenuItem,
   Select,
+  Stack,
   Typography,
 } from "@material-ui/core";
 
 import { Chart as ChartJS, ArcElement, Tooltip, Legend } from 'chart.js';
 import { Pie } from 'react-chartjs-2';
+import { PollAnswer } from "../models/PollAnswer";
 
 ChartJS.register(ArcElement, Tooltip, Legend);
 
-function getWindowDimensions() {
-  const { innerWidth: width, innerHeight: height } = window;
-  return {
-    width,
-    height,
-  };
-}
-
-function useWindowDimensions() {
-  const [windowDimensions, setWindowDimensions] = useState(
-    getWindowDimensions()
-  );
-
-  useEffect(() => {
-    function handleResize() {
-      setWindowDimensions(getWindowDimensions());
-    }
-
-    window.addEventListener("resize", handleResize);
-    return () => window.removeEventListener("resize", handleResize);
-  }, []);
-
-  return windowDimensions;
-}
-
 function ListOwnPolls(props: any): React.ReactElement {
-  const { history, hideTitle } =
+  const { history, hideTitle, walletInstance } =
     props;
 
   const [selectedPoll, setSelectedPoll] = useState('');
+  const [myPolls, setMyPolls] = useState(new Map<string, string>());
+  const [pollDictionary, setPollDictionary] = useState(new Map<string, PollAnswer>());
+
+  const updateMyPolls = (k: string,v: string) => {
+    setMyPolls(new Map(myPolls.set(k,v)));
+  }
 
   const filteredHistory = history.filter((el: any) => {
     try {
       const poll = JSON.parse(el.memos.out[0]);
-      return poll.isPollAnswer && poll.validVoters.includes(poll.votedBy);
+      return poll.isPollAnswer && poll.version === "v1.0";
     }
     catch(e) {
       return false;
     }
   });
 
-  const pollDictionary = new Map();
-  
-  filteredHistory
-            .map((el: any) => {
-                const pollAnswer = JSON.parse(el.memos.out[0]);
+  async function buildPollDictionary(): Promise<Map<string, PollAnswer>> {
+    const pollDictionary2 = new Map<string, PollAnswer>();
 
-                if(pollDictionary.get(pollAnswer.title) === undefined) {
-                    const optionMap = new Map();
-                    optionMap.set(pollAnswer.answer, 1);
-                    pollDictionary.set(pollAnswer.title, optionMap);
-                } else {
-                    if(pollDictionary.get(pollAnswer.title).get(pollAnswer.answer) === undefined) {
-                        pollDictionary.get(pollAnswer.title).set(pollAnswer.answer, 1);
-                    } else {
-                        let currentAnswerScore = pollDictionary.get(pollAnswer.title).get(pollAnswer.answer);
-                        currentAnswerScore = currentAnswerScore + 1;
-                        pollDictionary.get(pollAnswer.title).set(pollAnswer.answer, currentAnswerScore);
-                    }
+    await Promise.all(
+      filteredHistory
+        .map(async (el: any) => {
+          const pollAnswer = JSON.parse(el.memos.out[0]);
+          const infosOfPoll = await walletInstance.db.GetValue(pollAnswer.id);
+
+          if(infosOfPoll !== undefined) {
+            const validVoters = infosOfPoll.get("validVoters");
+            const validOptions = infosOfPoll.get("validOptions");
+
+            // only count vote if it was sent by a valid voter and contains a valid option
+            if(infosOfPoll !== undefined && validVoters.includes(pollAnswer.votedBy) && validOptions.includes(pollAnswer.answer)) {
+                if(pollDictionary2.get(pollAnswer.id) === undefined) {
+                  const pa = new PollAnswer();
+                  pa.title = pollAnswer.title;
+                  pa.optionsWithCount.set(pollAnswer.answer, 1);
+                  pollDictionary2.set(pollAnswer.id, pa);
+                  updateMyPolls(pollAnswer.id, pollAnswer.title);
+                } 
+                else {
+                  if(pollDictionary2.get(pollAnswer.id)?.optionsWithCount.get(pollAnswer.answer) === undefined) {
+                    pollDictionary2.get(pollAnswer.id)?.optionsWithCount.set(pollAnswer.answer, 1);
+                  } else {
+                    let currentAnswerScore = pollDictionary2.get(pollAnswer.id)?.optionsWithCount.get(pollAnswer.answer) ?? 0;
+                    currentAnswerScore = currentAnswerScore + 1;
+                    pollDictionary2.get(pollAnswer.id)?.optionsWithCount.set(pollAnswer.answer, currentAnswerScore);
+                  }
                 }
-            });
-
-  const pollTitles = Array.from(pollDictionary.keys());
+              }
+            }
+      }));
+      
+      return pollDictionary2;
+  }
 
   return (
     <Box
@@ -135,7 +134,14 @@ function ListOwnPolls(props: any): React.ReactElement {
               labelId="polls"
               id="polls"
               value={selectedPoll}
-              onChange={(e) => setSelectedPoll(e.target.value)}
+              onOpen={async () => {
+                const pd = await buildPollDictionary();
+                setPollDictionary(pd);
+              }}
+              onChange={(e) => {
+                setSelectedPoll(e.target.value)
+              }
+              }
               fullWidth={true}
               displayEmpty
               sx={{
@@ -143,11 +149,12 @@ function ListOwnPolls(props: any): React.ReactElement {
               }}
             >
             {
-              pollTitles.map(pollTitle => {
-                return (
-                  <MenuItem key={pollTitle} value={pollTitle}>{pollTitle}</MenuItem>
-                )
-              })              
+             [...myPolls.keys()].map((k: string) => {
+               return (
+                <MenuItem key={k} value={k}>{myPolls.get(k)}</MenuItem>
+               )
+             }
+            )
             }
             </Select>
 
@@ -160,13 +167,13 @@ function ListOwnPolls(props: any): React.ReactElement {
               }}
             >
               {
-                Array.from([...pollDictionary].values()).filter(poll => poll[0] === selectedPoll).map(poll => {
+                  [...pollDictionary].filter(x => x[0] === selectedPoll).map(poll => { 
                   const data = {
-                    labels: [...poll[1]].map(option => { return(option[0]); }),
+                    labels: [...poll[1].optionsWithCount].map(optionsWithCount => { return(optionsWithCount[0]); }),
                     datasets: [
                       {
                         label: '# of Votes',
-                        data: [...poll[1]].map(option => { return(option[1]); }),
+                        data: [...poll[1].optionsWithCount].map(optionsWithCount => { return(optionsWithCount[1]); }),
                         backgroundColor: [
                           'rgba(10, 135, 245, .8)',
                           'rgba(114, 81, 214, .8)',
@@ -203,6 +210,7 @@ function ListOwnPolls(props: any): React.ReactElement {
                           textAlign: "center"
                         }}>
                         <ListItemText
+                          key={poll[0]}
                           primary={
                             <React.Fragment>
                               <Typography
@@ -214,7 +222,7 @@ function ListOwnPolls(props: any): React.ReactElement {
                                 }}
                                 variant={"h5"}
                               >
-                                {poll[0]}
+                                {poll[1].title}
                               </Typography>
                             </React.Fragment>
                           }
@@ -230,25 +238,37 @@ function ListOwnPolls(props: any): React.ReactElement {
                                 variant="body2"
                               >
                                 {
-                                  [...poll[1]].map(option => {
-                                   {option.key}
+                                   [...poll[1].optionsWithCount].map(option => {
+                                   {option[0]}
                                   })
                                 }
                               </Typography>
                             </React.Fragment>
                           }
                         />
-                        <Pie  
-                          key={poll[0].key}
+
+                        <Pie
+                          key={poll[1].title}
                           data={data} />
-                        </Box>
+
+                        <Button
+                          sx={{mt: 4}}
+                          onClick={async () => {
+                            const pd = await buildPollDictionary();
+                            setPollDictionary(pd);
+                          }}
+                          >
+                          Refresh data 
+                        </Button>
+                      </Box>
                   </ListItem>
                     </>
                   );
                 })
               }
-            </List>
             
+            </List>
+
         </>
       </Box>
       <Box sx={{

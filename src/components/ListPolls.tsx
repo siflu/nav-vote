@@ -168,7 +168,7 @@ function ListPolls(props: any): React.ReactElement {
                         validUntil: fullSelectedPoll.validUntil,
                         isPollAnswer: true,
                         votedBy: votingAddress,
-                        validVoters: fullSelectedPoll.validVoters
+                        version: "v1.0"
                       }
 
                       if (!errorDest && pollAnswer.createdBy) {

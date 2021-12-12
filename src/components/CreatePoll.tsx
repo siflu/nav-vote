@@ -59,14 +59,14 @@ export default function CreatePoll(props: any): React.ReactElement {
 
               if (resolvedName["nav"] && wallet.bitcore.Address.isValid(resolvedName["nav"])) {
                 voterAddress = resolvedName["nav"]
-                validVoters.push(voterAddress);                         
+                validVoters.push(voterAddress);
               }
             } catch(e) {
               return;
             }
           } else {
             voterAddress = rec.toString()
-            validVoters.push(voterAddress);                         
+            validVoters.push(voterAddress);
           }
       }
     }));
@@ -76,7 +76,7 @@ export default function CreatePoll(props: any): React.ReactElement {
 
 
   return (
-    
+
     <Box
       sx={{
         display: "flex",
@@ -160,8 +160,8 @@ export default function CreatePoll(props: any): React.ReactElement {
               />
               </>
             )}
-             
-            
+
+
             {/* Options */}
             <Autocomplete
               multiple
@@ -258,7 +258,7 @@ export default function CreatePoll(props: any): React.ReactElement {
 
                     destinations.push({
                         dest: voterAddress,
-                        amount: 1 * 1e8,
+                        amount: 0 * 1e8,
                         memo: JSON.stringify(poll),
                     });
                 }
@@ -268,19 +268,24 @@ export default function CreatePoll(props: any): React.ReactElement {
                   return;
                 }
               }));
-              
+
               if(!hasDestErrors && !hasOptionsErrors) {
                 while((await walletInstance.GetBalance()).xnav.confirmed === 0) {
                   console.log("waiting...")
                   await delay(1000);
                 }
-              
-                console.log(destinations)
+
+                const pollInformationsToSave = new Map<string, any[]>();
+                pollInformationsToSave.set("validVoters", validVoters);
+                pollInformationsToSave.set("validOptions", options);
+
                 await onSendMultiple(
                   from,
                   destinations,
                   true,
-                  `Do you really want to send the poll?`
+                  `Do you really want to send the poll?`,
+                  poll.id,
+                  pollInformationsToSave
                 );
               }
             }
@@ -289,9 +294,9 @@ export default function CreatePoll(props: any): React.ReactElement {
             Send
           </Button>
 
-          <Snackbar 
-            open={open} 
-            autoHideDuration={6000} 
+          <Snackbar
+            open={open}
+            autoHideDuration={6000}
             onClose={handleClose}
             anchorOrigin={{
               vertical: "top",

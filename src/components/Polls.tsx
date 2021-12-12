@@ -80,6 +80,7 @@ function Polls(props: any): React.ReactElement {
                             syncProgress={syncProgress}
                             pendingQueue={pendingQueue}
                             wallet={wallet}
+                            walletInstance={walletInstance}
                             network={network}
                             onSend={onSend}></ListOwnPolls>
 
