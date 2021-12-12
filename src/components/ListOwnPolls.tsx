@@ -22,12 +22,12 @@ function ListOwnPolls(props: any): React.ReactElement {
     props;
 
   const [selectedPoll, setSelectedPoll] = useState('');
-  const [myPolls, setMyPolls] = useState(new Map<string, string>());
+  //const [myPolls, setMyPolls] = useState(new Map<string, string>());
   const [pollDictionary, setPollDictionary] = useState(new Map<string, PollAnswer>());
 
-  const updateMyPolls = (k: string,v: string) => {
-    setMyPolls(new Map(myPolls.set(k,v)));
-  }
+  // const updateMyPolls = (k: string,v: string) => {
+  //   setMyPolls(new Map(myPolls.set(k,v)));
+  // }
 
   const filteredHistory = history.filter((el: any) => {
     try {
@@ -59,7 +59,7 @@ function ListOwnPolls(props: any): React.ReactElement {
                   pa.title = pollAnswer.title;
                   pa.optionsWithCount.set(pollAnswer.answer, 1);
                   pollDictionary2.set(pollAnswer.id, pa);
-                  updateMyPolls(pollAnswer.id, pollAnswer.title);
+                  //updateMyPolls(pollAnswer.id, pollAnswer.title);
                 } 
                 else {
                   if(pollDictionary2.get(pollAnswer.id)?.optionsWithCount.get(pollAnswer.answer) === undefined) {
@@ -149,9 +149,9 @@ function ListOwnPolls(props: any): React.ReactElement {
               }}
             >
             {
-             [...myPolls.keys()].map((k: string) => {
+               [...pollDictionary].map(poll => {
                return (
-                <MenuItem key={k} value={k}>{myPolls.get(k)}</MenuItem>
+                <MenuItem key={poll[0]} value={poll[0]}>{poll[1].title}</MenuItem>
                )
              }
             )
