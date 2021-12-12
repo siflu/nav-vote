@@ -22,12 +22,7 @@ function ListOwnPolls(props: any): React.ReactElement {
     props;
 
   const [selectedPoll, setSelectedPoll] = useState('');
-  //const [myPolls, setMyPolls] = useState(new Map<string, string>());
   const [pollDictionary, setPollDictionary] = useState(new Map<string, PollAnswer>());
-
-  // const updateMyPolls = (k: string,v: string) => {
-  //   setMyPolls(new Map(myPolls.set(k,v)));
-  // }
 
   const filteredHistory = history.filter((el: any) => {
     try {
@@ -40,7 +35,7 @@ function ListOwnPolls(props: any): React.ReactElement {
   });
 
   async function buildPollDictionary(): Promise<Map<string, PollAnswer>> {
-    const pollDictionary2 = new Map<string, PollAnswer>();
+    const pollDictionary = new Map<string, PollAnswer>();
 
     await Promise.all(
       filteredHistory
@@ -54,27 +49,26 @@ function ListOwnPolls(props: any): React.ReactElement {
 
             // only count vote if it was sent by a valid voter and contains a valid option
             if(infosOfPoll !== undefined && validVoters.includes(pollAnswer.votedBy) && validOptions.includes(pollAnswer.answer)) {
-                if(pollDictionary2.get(pollAnswer.id) === undefined) {
+                if(pollDictionary.get(pollAnswer.id) === undefined) {
                   const pa = new PollAnswer();
                   pa.title = pollAnswer.title;
                   pa.optionsWithCount.set(pollAnswer.answer, 1);
-                  pollDictionary2.set(pollAnswer.id, pa);
-                  //updateMyPolls(pollAnswer.id, pollAnswer.title);
+                  pollDictionary.set(pollAnswer.id, pa);
                 } 
                 else {
-                  if(pollDictionary2.get(pollAnswer.id)?.optionsWithCount.get(pollAnswer.answer) === undefined) {
-                    pollDictionary2.get(pollAnswer.id)?.optionsWithCount.set(pollAnswer.answer, 1);
+                  if(pollDictionary.get(pollAnswer.id)?.optionsWithCount.get(pollAnswer.answer) === undefined) {
+                    pollDictionary.get(pollAnswer.id)?.optionsWithCount.set(pollAnswer.answer, 1);
                   } else {
-                    let currentAnswerScore = pollDictionary2.get(pollAnswer.id)?.optionsWithCount.get(pollAnswer.answer) ?? 0;
+                    let currentAnswerScore = pollDictionary.get(pollAnswer.id)?.optionsWithCount.get(pollAnswer.answer) ?? 0;
                     currentAnswerScore = currentAnswerScore + 1;
-                    pollDictionary2.get(pollAnswer.id)?.optionsWithCount.set(pollAnswer.answer, currentAnswerScore);
+                    pollDictionary.get(pollAnswer.id)?.optionsWithCount.set(pollAnswer.answer, currentAnswerScore);
                   }
                 }
               }
             }
       }));
       
-      return pollDictionary2;
+      return pollDictionary;
   }
 
   return (
@@ -248,10 +242,11 @@ function ListOwnPolls(props: any): React.ReactElement {
                         />
 
                         <Pie
-                          key={poll[1].title}
+                          key={"chart" + poll[0]}
                           data={data} />
 
                         <Button
+                          key={"btn" + poll[0]}
                           sx={{mt: 4}}
                           onClick={async () => {
                             const pd = await buildPollDictionary();
