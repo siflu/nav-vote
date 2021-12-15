@@ -1,4 +1,6 @@
-# nav vote
+![alt text](https://github.com/siflu/nav-vote/blob/main/src/assets/logo.png?raw=true)
+
+
 
 nav vote is a lightwallet with voting capabilities.
 You can create polls, freely define the options you want to vote on and send it to 1-n receivers.
