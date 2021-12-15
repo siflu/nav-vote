@@ -20,7 +20,7 @@ dotNav names can be used when sending a poll to the voters.
 
 ## Additional information
 - The poll has been secured from manipulation by only allowing votes from initially defined receipients of the poll
-- The answers of the poll has been secured from manipulation by only allowing options that have been initially defined when creating the poll
+- The answers of the poll have been secured from manipulation by only allowing options that have been initially defined when creating the poll
 
 ## Ideas that will be worked on in the future
 - While creating the poll, have the option to limit the number of answers per voter to 1.
