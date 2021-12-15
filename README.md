@@ -1,6 +1,5 @@
 ![alt text](https://github.com/siflu/nav-vote/blob/main/src/assets/logo.png?raw=true)
 
-
 nav vote is a lightwallet created during the navcoin-js hackathon.
 It enables you to have privacy oriented voting capabilities via the Navcoin blockchain using xNAV.
 With the wallet, you can:
