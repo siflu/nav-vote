@@ -472,7 +472,6 @@ class App extends React.Component<any, any> {
       substractFee = true,
       confirmTxText = undefined
   ) => {
-    console.log(`substractFee ${substractFee}`);
     const afterFunc = async (password: string) => {
       const mnemonic: string = await this.wallet.db.GetMasterKey(
           "mnemonic",
@@ -550,13 +549,7 @@ class App extends React.Component<any, any> {
         });
       }
     } else if (from == "xnav") {
-      console.log(to,
-          amount,
-          memo,
-          password,
-          substractFee)
       try {
-        console.log(`xNavCreateTransaction: to: ${to} amount: ${amount} memo: ${memo} password: ${password} subtractFee: ${substractFee}`)
         const txs = await this.wallet.xNavCreateTransaction(
             to,
             amount,
@@ -724,8 +717,6 @@ class App extends React.Component<any, any> {
                 onOk={() => {
                   try {
                     if(this.state.pollId && this.state.pollInformationsToSave.size > 0) {
-                      console.log(this.state.pollId)
-                      console.log(this.state.pollInformationsToSave)
                       this.wallet.db.SetValue(this.state.pollId, this.state.pollInformationsToSave);
                     }
                     this.wallet.SendTransaction(toSendTxs);

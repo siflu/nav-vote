@@ -82,8 +82,6 @@ export default function OpenName(props: any) {
     setTabValue(newValue);
   };
 
-  console.log(nameData);
-
   return (
     <div>
       <Dialog

@@ -264,6 +264,7 @@ function Balance(props: any): React.ReactElement {
         }}
       >
         <List
+          key={"history"}
           sx={{
             maxWidth: 800,
             bgcolor: "background.paper",
@@ -283,15 +284,19 @@ function Balance(props: any): React.ReactElement {
                       paddingLeft: 4,
                     }}
                   >
-                    <ListItemAvatar>
+                    <ListItemAvatar
+                      key={"listavatar-" + el.id}>
                       <Avatar
+                        key={"avatar-" + el.id}
                         alt={el.type == "xnav" ? xnav : nav}
                         src={el.type == "xnav" ? xnav : nav}
                       />
                     </ListItemAvatar>
                     <ListItemText
+                      key={"type-" + el.id}
                       primary={
                         <Typography
+                          key={"typetext-" + el.id}
                           sx={{
                             color: (theme) =>
                               el.amount > 0
@@ -306,9 +311,9 @@ function Balance(props: any): React.ReactElement {
                             (el.type == "xnav" ? "xNAV" : "NAV")}
                         </Typography>
                       }
-                      secondary={
-                        <React.Fragment>
+                      secondary={  
                           <Typography
+                            key={"subtypetext-" + el.id}
                             sx={{ display: "inline", fontSize: "12px" }}
                             variant="body2"
                             color="text.primary"
@@ -319,13 +324,13 @@ function Balance(props: any): React.ReactElement {
                               ? "xNAV"
                               : "Staking"}
                           </Typography>
-                        </React.Fragment>
                       }
                     />
                     <ListItemText
+                      key={"datelist-" + el.id}
                       primary={
-                        <React.Fragment>
                           <Typography
+                            key={"date-" + el.id}
                             sx={{
                               paddingRight: 4,
                               textAlign: "right",
@@ -336,11 +341,10 @@ function Balance(props: any): React.ReactElement {
                           >
                             {new Date(el.timestamp * 1000).toLocaleString()}{" "}
                           </Typography>
-                        </React.Fragment>
                       }
                       secondary={
-                        <React.Fragment>
                           <Typography
+                            key={"status-" + el.id}
                             sx={{
                               paddingRight: 4,
                               textAlign: "right",
@@ -351,7 +355,6 @@ function Balance(props: any): React.ReactElement {
                           >
                             {el.confirmed ? "Confirmed" : "Pending"}
                           </Typography>
-                        </React.Fragment>
                       }
                     />
                   </ListItem>
