@@ -39,7 +39,8 @@ function Polls(props: any): React.ReactElement {
 
   const [pageNumber, setPageNumber] = useState(1);
   const { height, width } = useWindowDimensions();
-  const filteredHistory = history.filter((el: any) => el.memos.out[0] != "" && el.memos.out[0] != "Change");
+  const filteredHistory = history.filter((el: any) => { 
+    return el !== undefined && el.memos !== undefined && el.memos.out !== undefined && el.memos.out[0] != "" && el.memos.out[0] != "Change"});
   const itemsCount = Math.floor((height - 390) / 70);
 
   return (
