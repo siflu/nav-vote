@@ -40,6 +40,7 @@ function ListOwnPolls(props: any): React.ReactElement {
     await Promise.all(
       filteredHistory
         .map(async (el: any) => {
+          if(el !== undefined && el.memos !== undefined && el.memos.out !== undefined) {
           const pollAnswer = JSON.parse(el.memos.out[0]);
           const infosOfPoll = await walletInstance.db.GetValue(pollAnswer.id);
 
@@ -66,6 +67,7 @@ function ListOwnPolls(props: any): React.ReactElement {
                 }
               }
             }
+          }
       }));
       
       return pollDictionary;

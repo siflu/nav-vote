@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import {
+  Alert,
   Box,
   Button,
   MenuItem,
@@ -17,7 +18,7 @@ function getWindowDimensions() {
 
 
 function ListPolls(props: any): React.ReactElement {
-  const { history, hideTitle, onSend, utxoType, addresses, walletInstance, wallet } =
+  const { history, hideTitle, onSend, utxoType, addresses, xNavAvailable, walletInstance, wallet, syncProgress, pendingQueue } =
     props;
 
   const [from, setFrom] = React.useState("xnav");
@@ -52,12 +53,54 @@ function ListPolls(props: any): React.ReactElement {
         flexDirection: "column",
       }}
     >
+      {syncProgress < 100 && syncProgress >= 0 && pendingQueue >  0 && (
+        <Alert
+          sx={{
+            maxWidth: 400,
+            alignSelf: "center",
+            px: 4,
+            mt: 2,
+            backgroundColor: "rgba(0,0,0,0.9)",
+          }}
+          severity={"warning"}
+        >
+          {/* eslint-disable-next-line react/no-unescaped-entities */}
+          The wallet is currently syncing, please wait for transactions to confirm.
+        </Alert>
+      )}
+      { 
+      xNavAvailable ? null :
+        <Box 
+          sx={{
+            m: 4,
+            bgcolor: "#ff0033",
+            color: "#fff",
+            boxShadow: 2,
+            borderRadius: 2,
+          }}>
+            <Typography
+              sx={{
+                m: 4,
+                mt: 2,
+                mb: 2,
+                maxWidth: "100%",
+                wordWrap: "break-word",
+                textAlign: "center",
+              }}
+              variant={"h5"}
+            >
+              You need at least 0.1 xNav to be able to vote
+          </Typography>
+        </Box>
+    }
+
       {hideTitle ? (
         <></>
       ) : (
         <Typography
           sx={{
             m: 4,
+            mt: 2,
             mb: 2,
             maxWidth: "100%",
             wordWrap: "break-word",
@@ -99,6 +142,7 @@ function ListPolls(props: any): React.ReactElement {
             labelId="polls"
             id="polls"
             value={selectedPoll}
+            disabled={!xNavAvailable}
             onChange={(e) => setSelectedPoll(e.target.value)}
             fullWidth={true}
             displayEmpty
@@ -133,6 +177,7 @@ function ListPolls(props: any): React.ReactElement {
                   labelId="options"
                   id="options"
                   value={selectedOption}
+                  disabled={!xNavAvailable}
                   onChange={handleSelectedOptionChange}
                   fullWidth={true}
                   displayEmpty
@@ -153,6 +198,7 @@ function ListPolls(props: any): React.ReactElement {
                 >
                   <Button
                     sx={{ width: "auto", float: "right" }}
+                    disabled={!xNavAvailable}
                     onClick={async () => {
                       const fullSelectedPoll = polls[selectedPoll];
                       const fullSelectedOption = fullSelectedPoll.options[selectedOption];

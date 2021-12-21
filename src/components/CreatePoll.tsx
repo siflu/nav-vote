@@ -7,6 +7,7 @@ import {
   Autocomplete,
   Snackbar,
   Alert,
+  Typography,
 } from "@material-ui/core";
 import React from "react";
 import { v4 as uuidv4 } from 'uuid';
@@ -14,13 +15,15 @@ import { v4 as uuidv4 } from 'uuid';
 export default function CreatePoll(props: any): React.ReactElement {
   const {
     addresses,
+    xNavAvailable,
     balance,
     onSendMultiple,
     wallet,
     destination,
     hideTo,
     pollTitle,
-    walletInstance
+    walletInstance,
+    syncProgress, pendingQueue
   } = props
 
   const [from, setFrom] = React.useState("xnav");
@@ -85,13 +88,66 @@ export default function CreatePoll(props: any): React.ReactElement {
       }}
     >
 
+    {syncProgress < 100 && syncProgress >= 0 && (
+        <Alert
+          sx={{
+            maxWidth: 400,
+            alignSelf: "center",
+            px: 4,
+            mt: 2,
+            backgroundColor: "rgba(0,0,0,0.9)",
+          }}
+          severity={"warning"}
+        >
+          {/* eslint-disable-next-line react/no-unescaped-entities */}
+          The wallet is currently syncing, please wait for transactions to confirm.
+        </Alert>
+      )}
+    { 
+      xNavAvailable ? null :
+        <Box 
+          sx={{
+            m: 4,
+            bgcolor: "#ff0033",
+            color: "#fff",
+            boxShadow: 2,
+            borderRadius: 2,
+          }}>
+            <Typography
+              sx={{
+                m: 4,
+                mt: 2,
+                mb: 2,
+                maxWidth: "100%",
+                wordWrap: "break-word",
+                textAlign: "center",
+              }}
+              variant={"h5"}
+            >
+              You need at least 0.1 xNav to be able to create polls. 
+          </Typography>
+        </Box>
+    }
+      <Typography
+          sx={{
+            m: 4,
+            mt: 2,
+            mb: 2,
+            maxWidth: "100%",
+            wordWrap: "break-word",
+            textAlign: "center",
+          }}
+          variant={"h4"}
+        >
+          Create Poll
+      </Typography>
+
       <Box
         sx={{
           maxWidth: 800,
           width: "90%",
           borderRadius: 1,
           mt: 2,
-
           p: 4,
           pt: 4,
           alignSelf: "center",
@@ -105,7 +161,8 @@ export default function CreatePoll(props: any): React.ReactElement {
             m: (theme) => theme.spacing(0, 1, 1, 1),
           }}
         >
-          <Stack spacing={2}>
+         
+        <Stack spacing={2}>
 
           <TextField
               autoComplete="off"
@@ -117,6 +174,7 @@ export default function CreatePoll(props: any): React.ReactElement {
                 shrink: true,
               }}
               value={title}
+              disabled={!xNavAvailable}
               onChange={(e) => {
                 setPollTitle(e.target.value);
               }}
@@ -133,6 +191,7 @@ export default function CreatePoll(props: any): React.ReactElement {
                 options={[]}
                 defaultValue={[]}
                 freeSolo
+                disabled={!xNavAvailable}
                 onChange={(e, value) => setReceivers(() => value)}
                 renderTags={(
                   value: any[],
@@ -169,6 +228,7 @@ export default function CreatePoll(props: any): React.ReactElement {
               options={[]}
               defaultValue={[]}
               freeSolo
+              disabled={!xNavAvailable}
               onChange={(e, value) => setOptions(value)}
               renderTags={(
                 value: any[],
@@ -203,8 +263,10 @@ export default function CreatePoll(props: any): React.ReactElement {
         >
           <Button
             sx={{ width: "auto", float: "right" }}
+            disabled={!xNavAvailable}
             onClick={async () => {
 
+              if(xNavAvailable) {
               const validVoters = await getValidVoters();
 
               const poll = {
@@ -289,6 +351,7 @@ export default function CreatePoll(props: any): React.ReactElement {
                 );
               }
             }
+          }
          }
           >
             Send

@@ -63,6 +63,7 @@ interface IAppState {
   syncProgress: number;
   pendingQueue: number;
   addresses: any;
+  xNavAvailable: boolean,
   utxos: any;
   mnemonic: string;
   showMnemonic: boolean;
@@ -110,6 +111,7 @@ const INITIAL_STATE: IAppState = {
   syncProgress: -1,
   pendingQueue: -1,
   addresses: {},
+  xNavAvailable: false,
   utxos: [],
   mnemonic: "",
   showMnemonic: false,
@@ -222,6 +224,10 @@ class App extends React.Component<any, any> {
         });
 
         await this.wallet.Connect();
+
+        this.setState({
+          xNavAvailable: (this.state.balances.xnav.confirmed / 1e8) > 0.1
+        })
       });
 
       this.wallet.on("new_staking_address", async (a: any, b: any) => {
@@ -229,6 +235,10 @@ class App extends React.Component<any, any> {
           stakingAddresses: await this.wallet.GetStakingAddresses(),
           addresses: await this.wallet.GetAllAddresses(),
         });
+
+        this.setState({
+          xNavAvailable: (this.state.balances.xnav.confirmed / 1e8) > 0.1
+        })
       });
 
       this.wallet.on(
@@ -245,6 +255,10 @@ class App extends React.Component<any, any> {
               });
             }
             this.setState({ syncProgress: progress, pendingQueue: pending });
+
+            this.setState({
+              xNavAvailable: (this.state.balances.xnav.confirmed / 1e8) > 0.1
+            })
           }
       );
 
@@ -259,6 +273,10 @@ class App extends React.Component<any, any> {
           names: await this.wallet.GetMyNames(),
         });
         this.setState({ syncProgress: 100, pendingQueue: 0 });
+
+        this.setState({
+          xNavAvailable: (this.state.balances.xnav.confirmed / 1e8) > 0.1
+        })
       });
 
       this.wallet.on("connected", (server: string) =>
@@ -681,6 +699,7 @@ class App extends React.Component<any, any> {
       afterPassword,
       errorPassword,
       addresses,
+      xNavAvailable,
       confirmTxText,
       showConfirmTx,
       toSendTxs,
@@ -835,6 +854,7 @@ class App extends React.Component<any, any> {
                   ) : bottomNavigation == 3 ? (
                         <Polls
                             addresses={addresses}
+                            xNavAvailable={xNavAvailable}
                             balances={balances}
                             history={history}
                             syncProgress={syncProgress}
@@ -848,6 +868,7 @@ class App extends React.Component<any, any> {
                     ) : bottomNavigation == 4 ? (
                       <Vote
                           addresses={addresses}
+                          xNavAvailable={xNavAvailable}
                           balances={balances}
                           history={history}
                           syncProgress={syncProgress}

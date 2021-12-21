@@ -12,7 +12,7 @@ let theme = createTheme({
 
     background: {
       default: '#f0f0f0',
-      paper: '#fff'
+      paper: '#fff',
     }
   },
 });
