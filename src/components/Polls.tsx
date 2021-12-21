@@ -34,7 +34,7 @@ function useWindowDimensions() {
 }
 
 function Polls(props: any): React.ReactElement {
-  const { balances, history, syncProgress, pendingQueue, addresses, hideTitle, wallet, onSend, onSendMultiple, network, walletInstance } =
+  const { balances, history, syncProgress, pendingQueue, addresses, xNavAvailable, hideTitle, wallet, onSend, onSendMultiple, network, walletInstance } =
     props;
 
   const [pageNumber, setPageNumber] = useState(1);
@@ -51,38 +51,24 @@ function Polls(props: any): React.ReactElement {
         flexDirection: "column",
       }}
     >
-      {hideTitle ? (
-        <></>
-      ) : (
-        <Typography
-          sx={{
-            m: 4,
-            mb: 2,
-            maxWidth: "100%",
-            wordWrap: "break-word",
-            textAlign: "center",
-          }}
-          variant={"h4"}
-        >
-          Create Poll
-        </Typography>
-      )}
       <CreatePoll wallet={wallet}
                    network={network}
                    onSendMultiple={onSendMultiple}
                    balance={balances}
                    addresses={addresses}
+                   xNavAvailable={xNavAvailable}
                    walletInstance={walletInstance}></CreatePoll>
 
       <ListOwnPolls addresses={addresses}
-                            balances={balances}
-                            history={history}
-                            syncProgress={syncProgress}
-                            pendingQueue={pendingQueue}
-                            wallet={wallet}
-                            walletInstance={walletInstance}
-                            network={network}
-                            onSend={onSend}></ListOwnPolls>
+                    xNavAvailable={xNavAvailable}
+                    balances={balances}
+                    history={history}
+                    syncProgress={syncProgress}
+                    pendingQueue={pendingQueue}
+                    wallet={wallet}
+                    walletInstance={walletInstance}
+                    network={network}
+                    onSend={onSend}></ListOwnPolls>
 
             <Pagination
               sx={{ mt: 2, mx: "auto" }}

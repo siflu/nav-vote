@@ -32,7 +32,7 @@ function useWindowDimensions() {
 }
 
 function Vote(props: any): React.ReactElement {
-  const { balances, history, syncProgress, pendingQueue, addresses, wallet, onSend, network, hideTitle, } =
+  const { balances, history, syncProgress, pendingQueue, addresses, xNavAvailable, wallet, onSend, network, hideTitle, } =
     props;
 
   return (
@@ -45,13 +45,14 @@ function Vote(props: any): React.ReactElement {
       }}
     >      
       <ListPolls addresses={addresses}
-                            balances={balances}
-                            history={history}
-                            syncProgress={syncProgress}
-                            pendingQueue={pendingQueue}
-                            wallet={wallet}
-                            network={network}
-                            onSend={onSend}></ListPolls>
+                  xNavAvailable={xNavAvailable}
+                  balances={balances}
+                  history={history}
+                  syncProgress={syncProgress}
+                  pendingQueue={pendingQueue}
+                  wallet={wallet}
+                  network={network}
+                  onSend={onSend}></ListPolls>
     </Box>
   );
 }

@@ -17,7 +17,7 @@ function getWindowDimensions() {
 
 
 function ListPolls(props: any): React.ReactElement {
-  const { history, hideTitle, onSend, utxoType, addresses, walletInstance, wallet } =
+  const { history, hideTitle, onSend, utxoType, addresses, xNavAvailable, walletInstance, wallet } =
     props;
 
   const [from, setFrom] = React.useState("xnav");
@@ -52,12 +52,39 @@ function ListPolls(props: any): React.ReactElement {
         flexDirection: "column",
       }}
     >
+      { 
+      xNavAvailable ? null :
+        <Box 
+          sx={{
+            m: 4,
+            bgcolor: "#ff0033",
+            color: "#fff",
+            boxShadow: 2,
+            borderRadius: 2,
+          }}>
+            <Typography
+              sx={{
+                m: 4,
+                mt: 2,
+                mb: 2,
+                maxWidth: "100%",
+                wordWrap: "break-word",
+                textAlign: "center",
+              }}
+              variant={"h5"}
+            >
+              You need at least 1 xNav to be able to vote
+          </Typography>
+        </Box>
+    }
+
       {hideTitle ? (
         <></>
       ) : (
         <Typography
           sx={{
             m: 4,
+            mt: 2,
             mb: 2,
             maxWidth: "100%",
             wordWrap: "break-word",
@@ -99,6 +126,7 @@ function ListPolls(props: any): React.ReactElement {
             labelId="polls"
             id="polls"
             value={selectedPoll}
+            disabled={!xNavAvailable}
             onChange={(e) => setSelectedPoll(e.target.value)}
             fullWidth={true}
             displayEmpty
