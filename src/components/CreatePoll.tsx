@@ -22,7 +22,8 @@ export default function CreatePoll(props: any): React.ReactElement {
     destination,
     hideTo,
     pollTitle,
-    walletInstance
+    walletInstance,
+    syncProgress, pendingQueue
   } = props
 
   const [from, setFrom] = React.useState("xnav");
@@ -87,6 +88,21 @@ export default function CreatePoll(props: any): React.ReactElement {
       }}
     >
 
+    {syncProgress < 100 && syncProgress >= 0 && (
+        <Alert
+          sx={{
+            maxWidth: 400,
+            alignSelf: "center",
+            px: 4,
+            mt: 2,
+            backgroundColor: "rgba(0,0,0,0.9)",
+          }}
+          severity={"warning"}
+        >
+          {/* eslint-disable-next-line react/no-unescaped-entities */}
+          The wallet is currently syncing, please wait for transactions to confirm.
+        </Alert>
+      )}
     { 
       xNavAvailable ? null :
         <Box 
@@ -108,7 +124,7 @@ export default function CreatePoll(props: any): React.ReactElement {
               }}
               variant={"h5"}
             >
-              You need at least 0.1 xNav to be able to create polls
+              You need at least 0.1 xNav to be able to create polls. 
           </Typography>
         </Box>
     }

@@ -57,7 +57,9 @@ function Polls(props: any): React.ReactElement {
                    balance={balances}
                    addresses={addresses}
                    xNavAvailable={xNavAvailable}
-                   walletInstance={walletInstance}></CreatePoll>
+                   walletInstance={walletInstance}
+                   syncProgress={syncProgress}
+                   pendingQueue={pendingQueue}></CreatePoll>
 
       <ListOwnPolls addresses={addresses}
                     xNavAvailable={xNavAvailable}

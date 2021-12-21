@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import {
+  Alert,
   Box,
   Button,
   MenuItem,
@@ -17,7 +18,7 @@ function getWindowDimensions() {
 
 
 function ListPolls(props: any): React.ReactElement {
-  const { history, hideTitle, onSend, utxoType, addresses, xNavAvailable, walletInstance, wallet } =
+  const { history, hideTitle, onSend, utxoType, addresses, xNavAvailable, walletInstance, wallet, syncProgress, pendingQueue } =
     props;
 
   const [from, setFrom] = React.useState("xnav");
@@ -52,6 +53,21 @@ function ListPolls(props: any): React.ReactElement {
         flexDirection: "column",
       }}
     >
+      {syncProgress < 100 && syncProgress >= 0 && pendingQueue >  0 && (
+        <Alert
+          sx={{
+            maxWidth: 400,
+            alignSelf: "center",
+            px: 4,
+            mt: 2,
+            backgroundColor: "rgba(0,0,0,0.9)",
+          }}
+          severity={"warning"}
+        >
+          {/* eslint-disable-next-line react/no-unescaped-entities */}
+          The wallet is currently syncing, please wait for transactions to confirm.
+        </Alert>
+      )}
       { 
       xNavAvailable ? null :
         <Box 
@@ -161,6 +177,7 @@ function ListPolls(props: any): React.ReactElement {
                   labelId="options"
                   id="options"
                   value={selectedOption}
+                  disabled={!xNavAvailable}
                   onChange={handleSelectedOptionChange}
                   fullWidth={true}
                   displayEmpty
@@ -181,6 +198,7 @@ function ListPolls(props: any): React.ReactElement {
                 >
                   <Button
                     sx={{ width: "auto", float: "right" }}
+                    disabled={!xNavAvailable}
                     onClick={async () => {
                       const fullSelectedPoll = polls[selectedPoll];
                       const fullSelectedOption = fullSelectedPoll.options[selectedOption];
