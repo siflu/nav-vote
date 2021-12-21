@@ -226,7 +226,7 @@ class App extends React.Component<any, any> {
         await this.wallet.Connect();
 
         this.setState({
-          xNavAvailable: Object.entries(this.state.addresses["spending"]["private"]).filter((el: any) => el[1].used === 1 && el[1]["balances"]["xnav"].confirmed > 1).length > 0
+          xNavAvailable: (this.state.balances.xnav.confirmed / 1e8) > 0.1
         })
       });
 
@@ -237,7 +237,7 @@ class App extends React.Component<any, any> {
         });
 
         this.setState({
-          xNavAvailable: Object.entries(this.state.addresses["spending"]["private"]).filter((el: any) => el[1].used === 1 && el[1]["balances"]["xnav"].confirmed > 1).length > 0
+          xNavAvailable: (this.state.balances.xnav.confirmed / 1e8) > 0.1
         })
       });
 
@@ -257,7 +257,7 @@ class App extends React.Component<any, any> {
             this.setState({ syncProgress: progress, pendingQueue: pending });
 
             this.setState({
-              xNavAvailable: Object.entries(this.state.addresses["spending"]["private"]).filter((el: any) => el[1].used === 1 && el[1]["balances"]["xnav"].confirmed > 1).length > 0
+              xNavAvailable: (this.state.balances.xnav.confirmed / 1e8) > 0.1
             })
           }
       );
@@ -275,7 +275,7 @@ class App extends React.Component<any, any> {
         this.setState({ syncProgress: 100, pendingQueue: 0 });
 
         this.setState({
-          xNavAvailable: Object.entries(this.state.addresses["spending"]["private"]).filter((el: any) => el[1].used === 1 && el[1]["balances"]["xnav"].confirmed > 1).length > 0
+          xNavAvailable: (this.state.balances.xnav.confirmed / 1e8) > 0.1
         })
       });
 

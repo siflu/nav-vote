@@ -73,7 +73,7 @@ function ListPolls(props: any): React.ReactElement {
               }}
               variant={"h5"}
             >
-              You need at least 1 xNav to be able to vote
+              You need at least 0.1 xNav to be able to vote
           </Typography>
         </Box>
     }

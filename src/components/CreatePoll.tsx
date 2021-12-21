@@ -16,7 +16,7 @@ export default function CreatePoll(props: any): React.ReactElement {
   const {
     addresses,
     xNavAvailable,
-    balances,
+    balance,
     onSendMultiple,
     wallet,
     destination,
@@ -26,7 +26,7 @@ export default function CreatePoll(props: any): React.ReactElement {
   } = props
 
   const [from, setFrom] = React.useState("xnav");
-  if (!balances || !balances[from]) return <>Loading</>;
+  if (!balance || !balance[from]) return <>Loading</>;
   const [title, setPollTitle] = React.useState(pollTitle);
   const [to, setTo] = React.useState(destination);
   const [errorDest, setErrorDest] = React.useState(false);
@@ -76,8 +76,6 @@ export default function CreatePoll(props: any): React.ReactElement {
     return validVoters;
   }
 
-console.log(balances.xnav.confirmed)
-
 
   return (
 
@@ -110,7 +108,7 @@ console.log(balances.xnav.confirmed)
               }}
               variant={"h5"}
             >
-              You need at least 1 xNav to be able to create polls
+              You need at least 0.1 xNav to be able to create polls
           </Typography>
         </Box>
     }
